@@ -84,11 +84,17 @@ This document focus on the following topics:
 
 | Layer | Technology | Reason for choice |
 | :---- | :---- | :---- |
-| Front end |  |  |
-| Back end |  |  |
-| Database |  |  |
-| Hosting / deployment |  |  |
-| Testing & CI |  |  |
+| Front end | React with JavaScript and Vite | Reusable components suit the Reader, Librarian, and Administrator screens. Vite provides a React development/build workflow; a browser-based application matches PA0 without a native mobile client. |
+| Back end | Node.js with Express, REST/JSON API | JavaScript across client and server reduces language switching for the student team. Express routing and middleware support the six feature modules, input validation, authorization, and consistent error handling. |
+| Database | PostgreSQL | Relational constraints and transactions suit users, book titles, physical copies, loans, and reservations. Borrow/return operations need coordinated updates; detailed schema and concurrency rules belong to PA3. |
+| Hosting / deployment | Vercel for the React frontend; Render for the Express API and PostgreSQL | Retains the PA0 proposal and separates static frontend delivery from the API/database. Hosting is planned for PA5; budget, database retention, and service limits must be checked before provisioning. |
+| Testing & CI | Vitest + React Testing Library for frontend tests; Jest + Supertest for backend tests; GitHub Actions for CI | Matches WBS 4.1.2: component tests cover user interactions, API tests cover authorization and circulation rules, and CI provides repeatable checks. PA1 currently runs repository checks only; test setup is scheduled for PA4 and application test execution for PA5. |
+
+**Decision status:** Proposal prepared by Quân for PA1-Q2; review by Ánh and team confirmation are pending. This preserves PA0's proposed core stack and F01–F06 scope. No application packages, detailed schema, or deployment are introduced in PA1.
+
+**Implementation constraints:** Select supported, mutually compatible versions when the application is initialized and record them in manifests/lockfiles. The current repository CI uses Node.js 22; Vite currently requires Node.js 20.19+ or 22.12+, so verify the chosen toolchain before setup. Render's free web services can spin down after inactivity and free PostgreSQL databases expire after 30 days; Vinh must include a viable demo/data-retention plan in the cost estimate rather than assume free hosting lasts the entire course.
+
+**References:** [Vite setup](https://vite.dev/guide/), [Express middleware](https://expressjs.com/guide/using-middleware/), [PostgreSQL transactions](https://www.postgresql.org/docs/current/tutorial-transactions.html), [Vercel Vite deployment](https://vercel.com/docs/frameworks/frontend/vite), [Render free-service limits](https://render.com/docs/free), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/), [Supertest](https://github.com/forwardemail/supertest).
 
    3. ## **Hardware and Operating Environment**
 
