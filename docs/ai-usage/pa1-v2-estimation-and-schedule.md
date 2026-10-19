@@ -1,0 +1,24 @@
+# PA1-V2 AI Usage Record
+
+- Date: 2026-10-19
+- Member: Nguyễn Phan Thế Vinh (Team lead / PM · Tester)
+- Tool: Google DeepMind Agent (Antigravity AI)
+- Purpose: Formulate Three-Point (PERT) effort estimation, project schedule with Gantt data, milestone mapping, critical path determination, human resource allocation, and tooling/hosting cost model for task PA1-V2 (ACT-05 / ACT-06).
+- Output:
+  - Produced detailed Section 4.3 Estimation with PERT formula $E = (O + 4M + P)/6$, explicit assumptions, and full 69-package estimation table.
+  - Reconciled total effort to 318 person-hours across 69 level-3 work packages, aligning with team capacity of 7.23 h/person/week across 11 weeks (within the 6–8 h/week constraint).
+  - Produced Section 4.4 Schedule distinguishing Effort vs. Duration, specifying start/end dates and dependencies for all 69 packages, 6 Phase Gate Milestones (M1–M6), and a 67-calendar-day Critical Path.
+  - Produced Section 4.6 Human Resources & Cost Estimate ($1,272.00 labor + $14.00 Render demo buffer + $128.60 contingency reserve = $1,414.60 / 35,365,000 VND total budget).
+  - Populated all corresponding sections and tables in `pa/PA1/PA1-ProjectProposal-Plan.docx`, including Section 3.2 Technology Stack table that was blank in the original docx.
+  - Updated all 69 due dates in `docs/management/pa1-wbs-board.json`.
+- Verification:
+  - Checked mathematical integrity of PERT expected values against WBS package effort values.
+  - Verified total effort by owner: Vinh (96h), Nguyên (54h), Ánh (64h), Quân (104h) summing to exactly 318h.
+  - Checked milestone deadlines against Fall 2026 course schedule: M1 (Oct 25), M2 (Nov 08), M3 (Nov 22), M4 (Nov 29), M5 (Dec 13), M6 (Dec 20).
+  - Verified Finish-to-Start dependency network, verifying no circular dependencies and verifying critical path flows continuously from kickoff to final closeout.
+  - Cross-referenced hosting buffer with Render Starter pricing ($7/mo web service + $7/mo PostgreSQL) to address cold start spin-down and 30-day database expiration.
+- Corrections and findings:
+  - Resolved discrepancy between preliminary template placeholder (274h) and bottom-up WBS sum (318h), updating summary rows in Table 6 to maintain consistency.
+  - Populated due dates for all 69 work packages in `pa1-wbs-board.json` to resolve Q2's dependency.
+- Remaining: Developer (Quân) review of technical estimates and critical path feasibility; Designer (Ánh) visual Gantt chart alignment (task A2).
+- Handoff: Consolidated into PA1 Section 7; ready for team review and PR creation.
