@@ -273,4 +273,5 @@ One of the main goals of the project is to practise teamwork for professional so
 | # | Member | Tool | Task / purpose | How the output was verified and changed |
 | :---- | :---- | :---- | :---- | :---- |
 | 1 | Nguyễn Phan Thế Vinh | Google DeepMind Agent (Antigravity AI) | Structured the 3-level WBS, drafted phase gate exit criteria, and formulated kickoff meeting minutes. | Verified against PA0 Must-have features (F01–F06), aligned effort hours (2–8h per package), and ensured role assignments strictly reflect the Team Contract. |
+| 2 | Trần Hà Anh Quân | OpenAI Codex | Prepared README, repository CI, PR template, Dependabot configuration, Copilot instructions, and PA1 tooling setup documentation for Q1–Q2 / ACT-08. | Automated local checks executed the three CI shell checks successfully, verified relative documentation links, and scanned new files for conflict markers. Stack remains proposed pending Ánh's confirmation. Human review and GitHub Actions/Copilot verification are pending; no application tests or deployment were performed. |
 
