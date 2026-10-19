@@ -22,6 +22,7 @@ are outside the agreed scope.
 
 Quân owns the proposal in PA1 Section 3.2; Ánh reviews it before team confirmation.
 Initial proposal: React, Node.js, Express, PostgreSQL.
+The five-layer proposal and reasons are in [PA1 Section 3.2](pa/PA1/PA1-ProjectProposal-Plan.md).
 
 ## Getting Started
 
@@ -60,6 +61,7 @@ have an issue, an owner, and a due date.
 - [PA1: Project Proposal & Plan](pa/PA1/PA1-ProjectProposal-Plan.md)
 - [Kickoff meeting minutes](docs/management/kickoff-meeting-minutes.md)
 - [PA1 tools setup and GitHub verification checklist](docs/management/pa1-tools-setup.md)
+- [Q2 task board setup and WBS reconciliation](docs/management/pa1-q2-board-setup.md)
 
 ## Repository Structure
 
