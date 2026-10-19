@@ -1,0 +1,75 @@
+name: UniLib CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  repository-checks:
+    name: repository-checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check README
+        run: test -s README.md
+
+      - name: Check merge conflicts
+        shell: bash
+        run: |
+          set +e
+          git grep -n -I -E '^(<{7}( |$)|={7}$|>{7}( |$))'
+          status=$?
+          set -e
+          if [ "$status" -eq 0 ]; then
+            echo "Unresolved merge conflicts found"
+            exit 1
+          elif [ "$status" -ne 1 ]; then
+            echo "Unable to check merge conflicts (git grep exit $status)"
+            exit "$status"
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check application packages if present
+        shell: bash
+        run: |
+          set -euo pipefail
+          found=0
+
+          # Provisional paths; update after the team confirms the architecture.
+          for dir in frontend backend; do
+            if [ -f "$dir/package.json" ]; then
+              found=1
+              (
+                cd "$dir"
+
+                if [ ! -f package-lock.json ]; then
+                  echo "Missing package-lock.json in $dir"
+                  exit 1
+                fi
+
+                npm ci
+                npm run lint --if-present
+                npm test --if-present
+                npm run build --if-present
+              )
+            fi
+          done
+
+          if [ "$found" -eq 0 ]; then
+            echo "No application packages yet."
+            echo "Repository checks only."
+          fi
