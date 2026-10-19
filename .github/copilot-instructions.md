@@ -31,5 +31,6 @@ UniLib is a university library management web application.
 - Do not merge changes automatically.
 - CI success does not replace human review.
 - Record meaningful AI usage in the PA AI Usage Log.
-- Treat React, Node.js, Express, and PostgreSQL as proposals until Ánh confirms PA1 Section 3.
-- Create application directories only after the team confirms the source structure.
+- Quân owns the PA1 Section 3.2 technology proposal; Ánh reviews it before team confirmation.
+- Treat React, Node.js, Express, and PostgreSQL as proposals until that review and confirmation.
+- Preserve the required `src/` skeleton; create its internal application structure only after team confirmation.
