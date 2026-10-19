@@ -1,20 +1,23 @@
 # PA1 Tools & Collaboration Setup
 
-Owner: Trần Hà Anh Quân (Q1–Q2 / ACT-08). Peer reviewer: Nguyễn Phan Thế Vinh.
+Owner: Trần Hà Anh Quân (PA1-Q1–Q3 / ACT-08). Peer reviewer for Q1/Q3: Nguyễn Phan Thế Vinh.
+Quân owns the Q2 technology proposal in Section 3.2; Ánh reviews it.
 
 ## Repository configuration
 
 | File | Purpose |
 | --- | --- |
 | [README](../../README.md) | Scope, proposed stack, and collaboration workflow |
+| [.gitignore](../../.gitignore) | Local environment files, dependencies, build output, and editor files |
 | [CI workflow](../../.github/workflows/ci.yml) | Repository checks and conditional application checks |
 | [PR template](../../.github/PULL_REQUEST_TEMPLATE.md) | Issue/WBS links, review checklist, AI usage, and evidence |
 | [Dependabot](../../.github/dependabot.yml) | Weekly GitHub Actions dependency update checks |
 | [Copilot instructions](../../.github/copilot-instructions.md) | Project-specific review guidance |
 
-These files prepare the repository configuration. They do not establish that
-GitHub Actions, branch protection, a Projects board, or Copilot review has been
-verified on GitHub. Record actual evidence below after verification.
+The template skeleton is present under `src/`, `docs/management/weekly/`,
+`docs/requirements/`, `docs/design/`, `docs/test/`, `docs/ai-usage/`, and
+`pa/PA1/` through `pa/PA5/`. Empty directories use `.gitkeep`. This does not
+introduce feature code, a database schema, or an application deployment.
 
 ## CI behavior
 
@@ -28,8 +31,9 @@ runs `npm ci` followed by any available lint, test, and build scripts. A failing
 command stops the job. Without packages, CI explicitly reports repository-only
 checks. A green result at this stage is not application test or deployment evidence.
 
-The directory names are provisional; no application directories are created by
-this setup. Once Ánh confirms the architecture, update package paths, supported
+The package directory names are provisional; only the required `src/` skeleton
+is created. Once the team confirms the architecture and Quân's technology proposal
+has been reviewed by Ánh, update package paths, supported
 Node version, and required scripts. Replace optional script execution with required
 checks so missing tests cannot silently pass. Add npm Dependabot entries for the
 confirmed directories and design deployment separately when hosting is agreed.
@@ -58,14 +62,38 @@ Use GitHub Issues and Projects for WBS tasks, owners, due dates, and progress.
 Add the actual board link when verified. Follow the kickoff meeting's communication
 rules and retain weekly reports under `docs/management/weekly/` when authored.
 
-## Evidence to collect
+## Evidence and remaining Q1 checks
 
-- [ ] Setup PR URL
-- [ ] Passing GitHub Actions run URL and repository-only log output
-- [ ] Copilot review URL, or a note explaining unavailable access
-- [ ] Human approval URL
-- [ ] Main branch protection/rules evidence
-- [ ] GitHub Projects board URL with assigned WBS tasks
-- [ ] Dependabot configuration verified on the default branch
+Status recorded on 2026-10-19; distinguish repository configuration from GitHub settings.
 
-No remote verification evidence has been recorded yet.
+| Item | Evidence / status |
+| --- | --- |
+| Initial setup | [PR #2](https://github.com/Vincenthevinh/UniLib/pull/2), merged as `72d44fa` in main history |
+| Initial CI | [Actions run](https://github.com/Vincenthevinh/UniLib/actions/runs/39198066990), successful per the PR output supplied by Quân; repository checks only |
+| Copilot | [Review comment](https://github.com/Vincenthevinh/UniLib/pull/2#pullrequestreview-5566791056): unable to review because the requester reached their quota limit |
+| Human approval on PR #2 | Public reviews API returned only Copilot's `COMMENTED` entry; no human approval recorded |
+| Main protection | Public branch API returned `protected: false`; effective branch rules endpoint returned no rules. Authenticated account `thaquan` has push permission but no admin permission; administrator action is required |
+| TA / instructor access | Not verified; a repository administrator must confirm accepted collaborator access for the correct accounts |
+| Dependabot | Configuration is present in main; the latest main update changed Actions versions. Scheduled update behavior is not independently verified |
+| Projects board | Q2 deliverable; no board URL recorded yet |
+
+Q1 must remain open until branch protection, TA/instructor access, and human review
+of the completion PR are verified. A merged PR alone does not establish approval.
+
+Administrator checklist for `main`:
+
+- Require a pull request before merging.
+- Require at least one approving human review.
+- Require the `repository-checks` status check to pass.
+- Confirm TA and instructor accounts have accepted the intended repository access.
+- Record the settings evidence and approval link here after verification.
+
+## Q1 local validation
+
+On 2026-10-19, automated local checks verified all 11 template directories,
+15 ignore/keep cases (including nested `.env` files, sanitized examples, and
+submission artifacts), relative documentation links, and the three CI shell
+checks. `git diff --check` passed. No application tests or deployment were run.
+
+The [Q1 AI usage record](../ai-usage/pa1-q1-repository-setup.md) is ready for
+Vinh to consolidate into PA1 Section 7.

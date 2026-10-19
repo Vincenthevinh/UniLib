@@ -20,7 +20,7 @@ are outside the agreed scope.
 
 ## Technology Stack
 
-To be confirmed by Ánh in PA1 Section 3 (Technology Stack & Architecture).
+Quân owns the proposal in PA1 Section 3.2; Ánh reviews it before team confirmation.
 Initial proposal: React, Node.js, Express, PostgreSQL.
 
 ## Getting Started
@@ -32,7 +32,8 @@ cd UniLib
 
 The repository currently contains planning documents and repository tooling.
 There is no application to install, run, or deploy yet. Application setup
-instructions and source directories will be added after architecture confirmation.
+instructions will be added after architecture confirmation. `src/` is a placeholder
+for the template's source directory; its internal structure is not decided yet.
 
 ## Collaboration Workflow
 
@@ -45,6 +46,10 @@ instructions and source directories will be added after architecture confirmatio
 7. Merge after approval and passing required checks.
 
 CI and AI review do not replace human review.
+
+Keep secrets in local `.env` files, which are ignored by Git. Commit only sanitized
+`.env.example` files with placeholder values. Review `git diff --staged` before
+committing; `.gitignore` does not remove files already tracked by Git.
 
 ## Project Management
 
@@ -59,8 +64,17 @@ have an issue, an owner, and a due date.
 ## Repository Structure
 
 ```text
-.github/             CI workflow, PR template, Copilot instructions, Dependabot
-docs/management/     Team coordination and tooling documentation
-pa/                  Phase submission documents
-README.md            Project overview and collaboration workflow
+.github/                  CI workflow, PR template, Copilot instructions, Dependabot
+src/                      Source placeholder; no feature code in PA1
+docs/management/          Team coordination and tooling documentation
+docs/management/weekly/   Weekly status reports
+docs/requirements/        Requirements documents
+docs/design/              Architecture and diagram sources
+docs/test/                Test documentation in later phases
+docs/ai-usage/            Supporting AI usage records
+pa/PA1/ ... pa/PA5/       Phase submission artifacts
+.gitignore                Local secrets, dependencies, and generated files
+README.md                 Project overview and collaboration workflow
 ```
+
+Empty template directories contain `.gitkeep` so Git preserves the skeleton.
