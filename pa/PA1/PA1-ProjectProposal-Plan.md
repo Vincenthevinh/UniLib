@@ -323,102 +323,102 @@ The project follows a linear Waterfall progression structured into 6 major lifec
 
 | Milestone | Phase | Key Deliverables & Exit Criteria | Target Baseline Date | Critical Path? |
 | :---- | :---- | :---- | :---- | :---- |
-| **M1** | PA1 | Project Proposal & Plan baselined, repo structure protected, GitHub Projects board populated with 69 WBS tasks. | 2026-10-25 (End of W3) | **Yes [CP]** |
-| **M2** | PA2 | SRS completed with detailed specs for F01–F06, Use Case model, wireframes, and RTM baseline. | 2026-11-08 (End of W5) | **Yes [CP]** |
-| **M3** | PA3 | C4 architecture (Context/Container), 3NF PostgreSQL schema DDL, REST API specs for F01–F06, and UI mockups. | 2026-11-22 (End of W7) | **Yes [CP]** |
-| **M4** | PA4 | Master Test Plan, detailed test cases for F01–F06 with 100% requirements coverage, and automated test setup. | 2026-11-29 (End of W8) | **Yes [CP]** |
-| **M5** | PA5 | Full implementation of F01–F06, automated test suite passing, 100% critical bugs resolved, deployed to Vercel/Render. | 2026-12-13 (End of W10) | **Yes [CP]** |
-| **M6** | Final | Live system demo of all 6 Must-haves, final slide deck, peer contribution assessments, and project retrospective. | 2026-12-20 (Week 11) | **Yes [CP]** |
+| **M1** | PA1 | Project Proposal & Plan baselined, repo structure protected, GitHub Projects board populated with 69 WBS tasks. | 2026-10-21 (Week 1) | **Yes [CP]** |
+| **M2** | PA2 | SRS completed with detailed specs for F01–F06, Use Case model, wireframes, and RTM baseline. | 2026-11-04 (Week 3) | **Yes [CP]** |
+| **M3** | PA3 | C4 architecture (Context/Container), 3NF PostgreSQL schema DDL, REST API specs for F01–F06, and UI mockups. | 2026-11-18 (Week 5) | **Yes [CP]** |
+| **M4** | PA4 | Master Test Plan, detailed test cases for F01–F06 with 100% requirements coverage, and automated test setup. | 2026-11-25 (Week 6) | **Yes [CP]** |
+| **M5** | PA5 | Full implementation of F01–F06, automated test suite passing, 100% critical bugs resolved, deployed to Vercel/Render. | 2026-12-09 (Week 8) | **Yes [CP]** |
+| **M6** | Final | Live system demo of all 6 Must-haves, final slide deck, peer contribution assessments, and project retrospective. | 2026-12-16 (Week 9) | **Yes [CP]** |
 
 ### **4.4.3 Master Project Schedule & Gantt Data Table**
 
 | WBS ID | Task / Work Package Name | Owner | Effort | Duration | Start Date | End Date | Predecessors | CP? |
 | :---- | :---- | :---- | :----: | :----: | :----: | :----: | :---- | :----: |
-| **PA1** | **Phase PA1 Timeline** | **Team** | **54h** | **-** | **2026-10-15** | **2026-10-24** | **-** | **[CP]** |
-| 1.1.1 | Project Kickoff Meeting & Charter Sign-off | Vinh | 3h | 1d | 2026-10-15 | 2026-10-15 | None | **[CP]** |
-| 1.1.2 | Governance & Roles Alignment | Vinh | 2h | 2d | 2026-10-15 | 2026-10-16 | 1.1.1 | - |
-| 1.2.1 | Preliminary Vision & Problem Statement | Nguyên | 5h | 4d | 2026-10-16 | 2026-10-19 | 1.1.1 | **[CP]** |
-| 1.2.2 | Stakeholder Needs & MoSCoW Scope | Nguyên | 4h | 3d | 2026-10-18 | 2026-10-20 | 1.2.1 | **[CP]** |
-| 1.2.3 | Preliminary Architecture & Technology Justification | Ánh | 4h | 4d | 2026-10-17 | 2026-10-20 | 1.2.1 | - |
-| 1.2.4 | Hardware & Operating Environment Specification | Ánh | 3h | 3d | 2026-10-19 | 2026-10-21 | 1.2.3 | - |
-| 1.2.5 | Process Gates & Exit Criteria Definition | Vinh | 3h | 3d | 2026-10-16 | 2026-10-18 | 1.1.2 | - |
-| 1.2.6 | Work Breakdown Structure (WBS) Authoring | Vinh | 6h | 3d | 2026-10-18 | 2026-10-20 | 1.2.2, 1.2.5 | **[CP]** |
-| 1.2.7 | Effort & Cost Estimation Baseline | Vinh | 4h | 3d | 2026-10-20 | 2026-10-22 | 1.2.3, 1.2.6 | - |
-| 1.2.8 | Project Schedule & Critical Path Mapping | Ánh | 5h | 3d | 2026-10-20 | 2026-10-22 | 1.2.6, 1.2.7 | **[CP]** |
-| 1.2.9 | Project Risk Identification & Mitigation | Vinh | 4h | 3d | 2026-10-21 | 2026-10-23 | 1.2.6, 1.2.7 | - |
-| 1.3.1 | Version Control & Repository Structure Setup | Quân | 3h | 3d | 2026-10-16 | 2026-10-18 | 1.1.1 | - |
-| 1.3.2 | Task Board & Tracking Configuration | Quân | 4h | 4d | 2026-10-19 | 2026-10-22 | 1.2.6, 1.3.1 | - |
-| 1.3.3 | PA1 Document Compilation & Review | Vinh | 4h | 3d | 2026-10-22 | 2026-10-24 | 1.2.4, 1.2.8, 1.2.9, 1.3.2 | **[CP]** |
-| **PA2** | **Phase PA2 Timeline** | **Team** | **60h** | **-** | **2026-10-26** | **2026-11-08** | **-** | **[CP]** |
-| 2.1.1 | Domain Modeling & Glossary Definition | Nguyên | 4h | 3d | 2026-10-26 | 2026-10-28 | M1 (PA1) | **[CP]** |
-| 2.1.2 | System Use Case Modeling | Nguyên | 4h | 4d | 2026-10-28 | 2026-10-31 | 2.1.1 | **[CP]** |
-| 2.2.1 | F01 User Authentication & Roles Specification | Nguyên | 4h | 4d | 2026-10-31 | 2026-11-03 | 2.1.2 | - |
-| 2.2.2 | F02 Book Catalog Management Specification | Nguyên | 5h | 4d | 2026-10-31 | 2026-11-03 | 2.1.2 | - |
-| 2.2.3 | F03 Book Copy Management Specification | Nguyên | 5h | 4d | 2026-11-01 | 2026-11-04 | 2.2.2 | - |
-| 2.2.4 | F04 Search & Browse Specification | Nguyên | 4h | 4d | 2026-11-01 | 2026-11-04 | 2.2.2, 2.2.3 | - |
-| 2.2.5 | F05 Borrow & Return Management Specification | Nguyên | 6h | 4d | 2026-11-02 | 2026-11-05 | 2.2.3 | **[CP]** |
-| 2.2.6 | F06 Book Reservation Specification | Nguyên | 5h | 4d | 2026-11-03 | 2026-11-06 | 2.2.5 | **[CP]** |
-| 2.2.7 | Non-Functional Requirements & Constraints | Ánh | 4h | 4d | 2026-11-02 | 2026-11-05 | 2.1.2 | - |
-| 2.3.1 | Reader/Student Workflow Wireframes | Ánh | 5h | 4d | 2026-11-03 | 2026-11-06 | 2.2.4, 2.2.6 | - |
-| 2.3.2 | Librarian & Admin Management Wireframes | Ánh | 6h | 4d | 2026-11-03 | 2026-11-06 | 2.2.2, 2.2.3, 2.2.5 | - |
-| 2.4.1 | Requirements Traceability Matrix (RTM) Baseline | Vinh | 4h | 3d | 2026-11-05 | 2026-11-07 | 2.2.1, 2.2.2, 2.2.3, 2.2.4, 2.2.5, 2.2.6 | **[CP]** |
-| 2.4.2 | PA2 Document Review & Verification | Vinh | 4h | 3d | 2026-11-06 | 2026-11-08 | 2.3.1, 2.3.2, 2.4.1 | **[CP]** |
-| **PA3** | **Phase PA3 Timeline** | **Team** | **56h** | **-** | **2026-11-09** | **2026-11-22** | **-** | **[CP]** |
-| 3.1.1 | C4 Architecture Modeling (Context & Container) | Ánh | 5h | 4d | 2026-11-09 | 2026-11-12 | M2 (PA2) | **[CP]** |
-| 3.1.2 | Architectural Decision Records (ADRs) | Quân | 4h | 4d | 2026-11-11 | 2026-11-14 | 3.1.1 | - |
-| 3.2.1 | Conceptual & Logical Data Modeling (ERD) | Ánh | 5h | 4d | 2026-11-11 | 2026-11-14 | 3.1.1 | **[CP]** |
-| 3.2.2 | Physical Database Schema & DDL Scripts | Quân | 5h | 4d | 2026-11-14 | 2026-11-17 | 3.2.1 | **[CP]** |
-| 3.3.1 | API Specification for F01 Auth & User Management | Quân | 4h | 4d | 2026-11-14 | 2026-11-17 | 3.1.1, 3.2.1 | - |
-| 3.3.2 | API Specification for F02 Catalog & F03 Copy Management | Quân | 5h | 4d | 2026-11-15 | 2026-11-18 | 3.2.2 | - |
-| 3.3.3 | API Specification for F04 Search & Browse | Quân | 4h | 4d | 2026-11-16 | 2026-11-19 | 3.3.2 | - |
-| 3.3.4 | API Specification for F05 Borrow & Return | Quân | 5h | 4d | 2026-11-16 | 2026-11-19 | 3.2.2, 3.3.2 | **[CP]** |
-| 3.3.5 | API Specification for F06 Book Reservation | Quân | 4h | 4d | 2026-11-17 | 2026-11-20 | 3.3.4 | **[CP]** |
-| 3.4.1 | UI Design System & Component Library | Ánh | 5h | 5d | 2026-11-12 | 2026-11-16 | M2 (PA2) | - |
-| 3.4.2 | High-Fidelity Mockups for Key Workflows | Ánh | 6h | 5d | 2026-11-16 | 2026-11-20 | 3.4.1 | - |
-| 3.5.1 | Design Review & Traceability Verification | Vinh | 4h | 4d | 2026-11-19 | 2026-11-22 | 3.1.2, 3.2.2, 3.3.1, 3.3.4, 3.3.5, 3.4.2 | **[CP]** |
-| **PA4** | **Phase PA4 Timeline** | **Team** | **41h** | **-** | **2026-11-23** | **2026-11-29** | **-** | **[CP]** |
-| 4.1.1 | Master Test Plan Authoring | Vinh | 5h | 3d | 2026-11-23 | 2026-11-25 | M3 (PA3) | **[CP]** |
-| 4.1.2 | Test Automation Framework Setup | Quân | 4h | 4d | 2026-11-23 | 2026-11-26 | M3 (PA3) | - |
-| 4.2.1 | Test Cases for F01 Authentication & Roles | Vinh | 5h | 3d | 2026-11-24 | 2026-11-26 | 4.1.1 | - |
-| 4.2.2 | Test Cases for F02 Catalog & F03 Copy Management | Vinh | 5h | 3d | 2026-11-24 | 2026-11-26 | 4.1.1 | - |
-| 4.2.3 | Test Cases for F04 Search & Browse | Vinh | 4h | 3d | 2026-11-25 | 2026-11-27 | 4.2.2 | - |
-| 4.2.4 | Test Cases for F05 Borrow & Return | Vinh | 6h | 3d | 2026-11-25 | 2026-11-27 | 4.1.1, 4.2.2 | **[CP]** |
-| 4.2.5 | Test Cases for F06 Book Reservation | Vinh | 5h | 3d | 2026-11-26 | 2026-11-28 | 4.2.4 | **[CP]** |
-| 4.3.1 | Test Traceability Matrix & Test Data Specification | Nguyên | 4h | 3d | 2026-11-26 | 2026-11-28 | 4.2.1, 4.2.2, 4.2.3, 4.2.4, 4.2.5 | **[CP]** |
-| 4.3.2 | PA4 Document Review & Baseline | Vinh | 3h | 3d | 2026-11-27 | 2026-11-29 | 4.1.2, 4.3.1 | **[CP]** |
-| **PA5** | **Phase PA5 Timeline** | **Team** | **91h** | **-** | **2026-11-30** | **2026-12-13** | **-** | **[CP]** |
-| 5.1.1 | Backend Boilerplate & DB Connection Setup | Quân | 5h | 3d | 2026-11-30 | 2026-12-02 | M3 (PA3), M4 (PA4) | **[CP]** |
-| 5.1.2 | Frontend Boilerplate & Layout Setup | Quân | 5h | 3d | 2026-11-30 | 2026-12-02 | M3 (PA3) | - |
-| 5.2.1 | F01 Authentication & Role-Based Access Control | Quân | 6h | 3d | 2026-12-01 | 2026-12-03 | 5.1.1, 5.1.2 | **[CP]** |
-| 5.2.2 | F02 Book Catalog Management Module | Quân | 6h | 4d | 2026-12-02 | 2026-12-05 | 5.2.1 | **[CP]** |
-| 5.2.3 | F03 Book Copy Management Module | Quân | 5h | 4d | 2026-12-03 | 2026-12-06 | 5.2.2 | **[CP]** |
-| 5.2.4 | F04 Search & Browse Books Module | Ánh | 6h | 4d | 2026-12-04 | 2026-12-07 | 5.2.2, 5.2.3 | - |
-| 5.2.5 | F05 Borrow & Return Management Module | Quân | 8h | 4d | 2026-12-05 | 2026-12-08 | 5.2.3 | **[CP]** |
-| 5.2.6 | F06 Book Reservation Module | Quân | 7h | 4d | 2026-12-06 | 2026-12-09 | 5.2.5 | **[CP]** |
-| 5.2.7 | Reader Dashboard & Active Loans View | Ánh | 5h | 3d | 2026-12-07 | 2026-12-09 | 5.2.4, 5.2.5, 5.2.6 | - |
-| 5.3.1 | Automated Unit & Integration Testing | Quân | 6h | 4d | 2026-12-07 | 2026-12-10 | 5.2.1, 5.2.2, 5.2.3, 5.2.5, 5.2.6 | **[CP]** |
-| 5.3.2 | Manual System Testing & Bug Logging | Vinh | 7h | 4d | 2026-12-08 | 2026-12-11 | 5.2.7, 5.3.1 | **[CP]** |
-| 5.3.3 | Bug Fixing & Regression Verification | Quân | 6h | 4d | 2026-12-09 | 2026-12-12 | 5.3.2 | **[CP]** |
-| 5.3.4 | Test Summary Report & QA Sign-off | Vinh | 4h | 3d | 2026-12-11 | 2026-12-13 | 5.3.3 | - |
-| 5.4.1 | Cloud DB & Backend Deployment on Render | Quân | 4h | 3d | 2026-12-10 | 2026-12-12 | 5.3.1, 5.3.3 | **[CP]** |
-| 5.4.2 | Frontend Cloud Deployment on Vercel | Quân | 4h | 3d | 2026-12-10 | 2026-12-12 | 5.4.1 | **[CP]** |
-| 5.4.3 | Production Smoke Testing & Deployment Documentation | Vinh | 4h | 3d | 2026-12-11 | 2026-12-13 | 5.4.2 | **[CP]** |
-| 5.4.4 | PA5 Submission & Code Baseline | Vinh | 3h | 2d | 2026-12-12 | 2026-12-13 | 5.3.4, 5.4.3 | **[CP]** |
-| **Final** | **Phase Final Timeline** | **Team** | **16h** | **-** | **2026-12-14** | **2026-12-20** | **-** | **[CP]** |
-| 6.1.1 | Demo Scenario Scripting & Seed Data Preparation | Nguyên | 4h | 3d | 2026-12-14 | 2026-12-16 | M5 (PA5) | **[CP]** |
-| 6.1.2 | Demo Rehearsal & Backup Recording | Vinh | 3h | 3d | 2026-12-16 | 2026-12-18 | 6.1.1 | **[CP]** |
-| 6.2.1 | Presentation Slide Deck Creation | Ánh | 5h | 4d | 2026-12-15 | 2026-12-18 | M5 (PA5) | - |
-| 6.2.2 | Final Contribution Assessment & Project Retrospective | Vinh | 4h | 3d | 2026-12-18 | 2026-12-20 | 6.1.2, 6.2.1 | **[CP]** |
+| **PA1** | **Phase PA1 Timeline** | **Team** | **54h** | **6d** | **2026-10-15** | **2026-10-21** | **-** | **[CP]** |
+| 1.1.1 | Project Kickoff Meeting & Charter Sign-off | Vinh | 3h | 0d | 2026-10-15 | 2026-10-15 | None | **[CP]** |
+| 1.1.2 | Governance & Roles Alignment | Vinh | 2h | 1d | 2026-10-15 | 2026-10-16 | 1.1.1 | - |
+| 1.2.1 | Preliminary Vision & Problem Statement | Nguyên | 5h | 2d | 2026-10-16 | 2026-10-18 | 1.1.1 | **[CP]** |
+| 1.2.2 | Stakeholder Needs & MoSCoW Scope | Nguyên | 4h | 2d | 2026-10-17 | 2026-10-19 | 1.2.1 | **[CP]** |
+| 1.2.3 | Preliminary Architecture & Technology Justification | Ánh | 4h | 2d | 2026-10-16 | 2026-10-18 | 1.2.1 | - |
+| 1.2.4 | Hardware & Operating Environment Specification | Ánh | 3h | 2d | 2026-10-17 | 2026-10-19 | 1.2.3 | - |
+| 1.2.5 | Process Gates & Exit Criteria Definition | Vinh | 3h | 1d | 2026-10-16 | 2026-10-17 | 1.1.2 | - |
+| 1.2.6 | Work Breakdown Structure (WBS) Authoring | Vinh | 6h | 2d | 2026-10-17 | 2026-10-19 | 1.2.2, 1.2.5 | **[CP]** |
+| 1.2.7 | Effort & Cost Estimation Baseline | Vinh | 4h | 2d | 2026-10-18 | 2026-10-20 | 1.2.3, 1.2.6 | - |
+| 1.2.8 | Project Schedule & Critical Path Mapping | Ánh | 5h | 2d | 2026-10-18 | 2026-10-20 | 1.2.6, 1.2.7 | **[CP]** |
+| 1.2.9 | Project Risk Identification & Mitigation | Vinh | 4h | 1d | 2026-10-19 | 2026-10-20 | 1.2.6, 1.2.7 | - |
+| 1.3.1 | Version Control & Repository Structure Setup | Quân | 3h | 1d | 2026-10-16 | 2026-10-17 | 1.1.1 | - |
+| 1.3.2 | Task Board & Tracking Configuration | Quân | 4h | 2d | 2026-10-18 | 2026-10-20 | 1.2.6, 1.3.1 | - |
+| 1.3.3 | PA1 Document Compilation & Review | Vinh | 4h | 1d | 2026-10-20 | 2026-10-21 | 1.2.4, 1.2.8, 1.2.9, 1.3.2 | **[CP]** |
+| **PA2** | **Phase PA2 Timeline** | **Team** | **60h** | **13d** | **2026-10-22** | **2026-11-04** | **-** | **[CP]** |
+| 2.1.1 | Domain Modeling & Glossary Definition | Nguyên | 4h | 2d | 2026-10-22 | 2026-10-24 | M1 (PA1) | **[CP]** |
+| 2.1.2 | System Use Case Modeling | Nguyên | 4h | 3d | 2026-10-24 | 2026-10-27 | 2.1.1 | **[CP]** |
+| 2.2.1 | F01 User Authentication & Roles Specification | Nguyên | 4h | 3d | 2026-10-27 | 2026-10-30 | 2.1.2 | - |
+| 2.2.2 | F02 Book Catalog Management Specification | Nguyên | 5h | 3d | 2026-10-27 | 2026-10-30 | 2.1.2 | - |
+| 2.2.3 | F03 Book Copy Management Specification | Nguyên | 5h | 3d | 2026-10-28 | 2026-10-31 | 2.2.2 | - |
+| 2.2.4 | F04 Search & Browse Specification | Nguyên | 4h | 3d | 2026-10-28 | 2026-10-31 | 2.2.2, 2.2.3 | - |
+| 2.2.5 | F05 Borrow & Return Management Specification | Nguyên | 6h | 3d | 2026-10-29 | 2026-11-01 | 2.2.3 | **[CP]** |
+| 2.2.6 | F06 Book Reservation Specification | Nguyên | 5h | 3d | 2026-10-30 | 2026-11-02 | 2.2.5 | **[CP]** |
+| 2.2.7 | Non-Functional Requirements & Constraints | Ánh | 4h | 3d | 2026-10-29 | 2026-11-01 | 2.1.2 | - |
+| 2.3.1 | Reader/Student Workflow Wireframes | Ánh | 5h | 3d | 2026-10-30 | 2026-11-02 | 2.2.4, 2.2.6 | - |
+| 2.3.2 | Librarian & Admin Management Wireframes | Ánh | 6h | 3d | 2026-10-30 | 2026-11-02 | 2.2.2, 2.2.3, 2.2.5 | - |
+| 2.4.1 | Requirements Traceability Matrix (RTM) Baseline | Vinh | 4h | 2d | 2026-11-01 | 2026-11-03 | 2.2.1, 2.2.2, 2.2.3, 2.2.4, 2.2.5, 2.2.6 | **[CP]** |
+| 2.4.2 | PA2 Document Review & Verification | Vinh | 4h | 2d | 2026-11-02 | 2026-11-04 | 2.3.1, 2.3.2, 2.4.1 | **[CP]** |
+| **PA3** | **Phase PA3 Timeline** | **Team** | **56h** | **13d** | **2026-11-05** | **2026-11-18** | **-** | **[CP]** |
+| 3.1.1 | C4 Architecture Modeling (Context & Container) | Ánh | 5h | 3d | 2026-11-05 | 2026-11-08 | M2 (PA2) | **[CP]** |
+| 3.1.2 | Architectural Decision Records (ADRs) | Quân | 4h | 3d | 2026-11-07 | 2026-11-10 | 3.1.1 | - |
+| 3.2.1 | Conceptual & Logical Data Modeling (ERD) | Ánh | 5h | 3d | 2026-11-07 | 2026-11-10 | 3.1.1 | **[CP]** |
+| 3.2.2 | Physical Database Schema & DDL Scripts | Quân | 5h | 3d | 2026-11-10 | 2026-11-13 | 3.2.1 | **[CP]** |
+| 3.3.1 | API Specification for F01 Auth & User Management | Quân | 4h | 3d | 2026-11-10 | 2026-11-13 | 3.1.1, 3.2.1 | - |
+| 3.3.2 | API Specification for F02 Catalog & F03 Copy Management | Quân | 5h | 3d | 2026-11-11 | 2026-11-14 | 3.2.2 | - |
+| 3.3.3 | API Specification for F04 Search & Browse | Quân | 4h | 3d | 2026-11-12 | 2026-11-15 | 3.3.2 | - |
+| 3.3.4 | API Specification for F05 Borrow & Return | Quân | 5h | 3d | 2026-11-12 | 2026-11-15 | 3.2.2, 3.3.2 | **[CP]** |
+| 3.3.5 | API Specification for F06 Book Reservation | Quân | 4h | 3d | 2026-11-13 | 2026-11-16 | 3.3.4 | **[CP]** |
+| 3.4.1 | UI Design System & Component Library | Ánh | 5h | 4d | 2026-11-08 | 2026-11-12 | M2 (PA2) | - |
+| 3.4.2 | High-Fidelity Mockups for Key Workflows | Ánh | 6h | 4d | 2026-11-12 | 2026-11-16 | 3.4.1 | - |
+| 3.5.1 | Design Review & Traceability Verification | Vinh | 4h | 3d | 2026-11-15 | 2026-11-18 | 3.1.2, 3.2.2, 3.3.1, 3.3.4, 3.3.5, 3.4.2 | **[CP]** |
+| **PA4** | **Phase PA4 Timeline** | **Team** | **41h** | **6d** | **2026-11-19** | **2026-11-25** | **-** | **[CP]** |
+| 4.1.1 | Master Test Plan Authoring | Vinh | 5h | 2d | 2026-11-19 | 2026-11-21 | M3 (PA3) | **[CP]** |
+| 4.1.2 | Test Automation Framework Setup | Quân | 4h | 3d | 2026-11-19 | 2026-11-22 | M3 (PA3) | - |
+| 4.2.1 | Test Cases for F01 Authentication & Roles | Vinh | 5h | 2d | 2026-11-20 | 2026-11-22 | 4.1.1 | - |
+| 4.2.2 | Test Cases for F02 Catalog & F03 Copy Management | Vinh | 5h | 2d | 2026-11-20 | 2026-11-22 | 4.1.1 | - |
+| 4.2.3 | Test Cases for F04 Search & Browse | Vinh | 4h | 2d | 2026-11-21 | 2026-11-23 | 4.2.2 | - |
+| 4.2.4 | Test Cases for F05 Borrow & Return | Vinh | 6h | 2d | 2026-11-21 | 2026-11-23 | 4.1.1, 4.2.2 | **[CP]** |
+| 4.2.5 | Test Cases for F06 Book Reservation | Vinh | 5h | 2d | 2026-11-22 | 2026-11-24 | 4.2.4 | **[CP]** |
+| 4.3.1 | Test Traceability Matrix & Test Data Specification | Nguyên | 4h | 2d | 2026-11-22 | 2026-11-24 | 4.2.1, 4.2.2, 4.2.3, 4.2.4, 4.2.5 | **[CP]** |
+| 4.3.2 | PA4 Document Review & Baseline | Vinh | 3h | 2d | 2026-11-23 | 2026-11-25 | 4.1.2, 4.3.1 | **[CP]** |
+| **PA5** | **Phase PA5 Timeline** | **Team** | **91h** | **13d** | **2026-11-26** | **2026-12-09** | **-** | **[CP]** |
+| 5.1.1 | Backend Boilerplate & DB Connection Setup | Quân | 5h | 2d | 2026-11-26 | 2026-11-28 | M3 (PA3), M4 (PA4) | **[CP]** |
+| 5.1.2 | Frontend Boilerplate & Layout Setup | Quân | 5h | 2d | 2026-11-26 | 2026-11-28 | M3 (PA3) | - |
+| 5.2.1 | F01 Authentication & Role-Based Access Control | Quân | 6h | 2d | 2026-11-27 | 2026-11-29 | 5.1.1, 5.1.2 | **[CP]** |
+| 5.2.2 | F02 Book Catalog Management Module | Quân | 6h | 3d | 2026-11-28 | 2026-12-01 | 5.2.1 | **[CP]** |
+| 5.2.3 | F03 Book Copy Management Module | Quân | 5h | 3d | 2026-11-29 | 2026-12-02 | 5.2.2 | **[CP]** |
+| 5.2.4 | F04 Search & Browse Books Module | Ánh | 6h | 3d | 2026-11-30 | 2026-12-03 | 5.2.2, 5.2.3 | - |
+| 5.2.5 | F05 Borrow & Return Management Module | Quân | 8h | 3d | 2026-12-01 | 2026-12-04 | 5.2.3 | **[CP]** |
+| 5.2.6 | F06 Book Reservation Module | Quân | 7h | 3d | 2026-12-02 | 2026-12-05 | 5.2.5 | **[CP]** |
+| 5.2.7 | Reader Dashboard & Active Loans View | Ánh | 5h | 2d | 2026-12-03 | 2026-12-05 | 5.2.4, 5.2.5, 5.2.6 | - |
+| 5.3.1 | Automated Unit & Integration Testing | Quân | 6h | 3d | 2026-12-03 | 2026-12-06 | 5.2.1, 5.2.2, 5.2.3, 5.2.5, 5.2.6 | **[CP]** |
+| 5.3.2 | Manual System Testing & Bug Logging | Vinh | 7h | 3d | 2026-12-04 | 2026-12-07 | 5.2.7, 5.3.1 | **[CP]** |
+| 5.3.3 | Bug Fixing & Regression Verification | Quân | 6h | 3d | 2026-12-05 | 2026-12-08 | 5.3.2 | **[CP]** |
+| 5.3.4 | Test Summary Report & QA Sign-off | Vinh | 4h | 2d | 2026-12-07 | 2026-12-09 | 5.3.3 | - |
+| 5.4.1 | Cloud DB & Backend Deployment on Render | Quân | 4h | 2d | 2026-12-06 | 2026-12-08 | 5.3.1, 5.3.3 | **[CP]** |
+| 5.4.2 | Frontend Cloud Deployment on Vercel | Quân | 4h | 2d | 2026-12-06 | 2026-12-08 | 5.4.1 | **[CP]** |
+| 5.4.3 | Production Smoke Testing & Deployment Documentation | Vinh | 4h | 2d | 2026-12-07 | 2026-12-09 | 5.4.2 | **[CP]** |
+| 5.4.4 | PA5 Submission & Code Baseline | Vinh | 3h | 1d | 2026-12-08 | 2026-12-09 | 5.3.4, 5.4.3 | **[CP]** |
+| **Final** | **Phase Final Timeline** | **Team** | **16h** | **6d** | **2026-12-10** | **2026-12-16** | **-** | **[CP]** |
+| 6.1.1 | Demo Scenario Scripting & Seed Data Preparation | Nguyên | 4h | 2d | 2026-12-10 | 2026-12-12 | M5 (PA5) | **[CP]** |
+| 6.1.2 | Demo Rehearsal & Backup Recording | Vinh | 3h | 2d | 2026-12-12 | 2026-12-14 | 6.1.1 | **[CP]** |
+| 6.2.1 | Presentation Slide Deck Creation | Ánh | 5h | 3d | 2026-12-11 | 2026-12-14 | M5 (PA5) | - |
+| 6.2.2 | Final Contribution Assessment & Project Retrospective | Vinh | 4h | 2d | 2026-12-14 | 2026-12-16 | 6.1.2, 6.2.1 | **[CP]** |
 
 ### **4.4.4 Critical Path Analysis & Schedule Risk Management**
 The Critical Path (CP) represents the sequence of dependent work packages that directly dictates the overall project completion timeline. A delay in any critical path package directly delays the project phase gate milestone. In UniLib, the critical path rigorously flows through:
 
-* **Phase 1 (Initiation):** 1.1.1 (Kickoff) → 1.2.1 (Vision) → 1.2.2 (Scope) → 1.2.6 (WBS) → 1.2.8 (Schedule) → 1.3.3 (PA1 Baseline Review) → **Milestone M1 (Oct 25)**.
-* **Phase 2 (Requirements):** 2.1.1 (Domain Glossary) → 2.1.2 (Use Case Model) → 2.2.5 (F05 Borrow/Return Spec) → 2.2.6 (F06 Reservation Spec) → 2.4.1 (RTM Baseline) → 2.4.2 (PA2 Review) → **Milestone M2 (Nov 08)**.
-* **Phase 3 (Architecture & Design):** 3.1.1 (C4 Architecture) → 3.2.1 (ERD) → 3.2.2 (Physical DDL Schema) → 3.3.4 (F05 Circulation API) → 3.3.5 (F06 Reservation API) → 3.5.1 (PA3 Review) → **Milestone M3 (Nov 22)**.
-* **Phase 4 (Test Planning):** 4.1.1 (Master Test Plan) → 4.2.4 (F05 Circulation Test Cases) → 4.2.5 (F06 Reservation Test Cases) → 4.3.1 (Test Traceability) → 4.3.2 (PA4 Review) → **Milestone M4 (Nov 29)**.
-* **Phase 5 (Implementation & Deployment):** 5.1.1 (Backend & DB Setup) → 5.2.1 (F01 Auth & RBAC) → 5.2.2 (F02 Catalog) → 5.2.3 (F03 Copy Inventory) → 5.2.5 (F05 Borrow & Return Module) → 5.2.6 (F06 Reservation Module) → 5.3.1 (Integration Testing) → 5.3.2 (System Testing) → 5.3.3 (Bug Fixing) → 5.4.1 (Render DB Deploy) → 5.4.2 (Vercel Deploy) → 5.4.3 (Smoke Testing) → 5.4.4 (PA5 Submission) → **Milestone M5 (Dec 13)**.
-* **Phase 6 (Final Demo & Closeout):** 6.1.1 (Demo Script & Seed Data) → 6.1.2 (Demo Rehearsal) → 6.2.2 (Final Retrospective & Submission) → **Milestone M6 (Dec 20)**.
+* **Phase 1 (Initiation):** 1.1.1 (Kickoff) → 1.2.1 (Vision) → 1.2.2 (Scope) → 1.2.6 (WBS) → 1.2.8 (Schedule) → 1.3.3 (PA1 Baseline Review) → **Milestone M1 (Oct 21)**.
+* **Phase 2 (Requirements):** 2.1.1 (Domain Glossary) → 2.1.2 (Use Case Model) → 2.2.5 (F05 Borrow/Return Spec) → 2.2.6 (F06 Reservation Spec) → 2.4.1 (RTM Baseline) → 2.4.2 (PA2 Review) → **Milestone M2 (Nov 04)**.
+* **Phase 3 (Architecture & Design):** 3.1.1 (C4 Architecture) → 3.2.1 (ERD) → 3.2.2 (Physical DDL Schema) → 3.3.4 (F05 Circulation API) → 3.3.5 (F06 Reservation API) → 3.5.1 (PA3 Review) → **Milestone M3 (Nov 18)**.
+* **Phase 4 (Test Planning):** 4.1.1 (Master Test Plan) → 4.2.4 (F05 Circulation Test Cases) → 4.2.5 (F06 Reservation Test Cases) → 4.3.1 (Test Traceability) → 4.3.2 (PA4 Review) → **Milestone M4 (Nov 25)**.
+* **Phase 5 (Implementation & Deployment):** 5.1.1 (Backend & DB Setup) → 5.2.1 (F01 Auth & RBAC) → 5.2.2 (F02 Catalog) → 5.2.3 (F03 Copy Inventory) → 5.2.5 (F05 Borrow & Return Module) → 5.2.6 (F06 Reservation Module) → 5.3.1 (Integration Testing) → 5.3.2 (System Testing) → 5.3.3 (Bug Fixing) → 5.4.1 (Render DB Deploy) → 5.4.2 (Vercel Deploy) → 5.4.3 (Smoke Testing) → 5.4.4 (PA5 Submission) → **Milestone M5 (Dec 09)**.
+* **Phase 6 (Final Demo & Closeout):** 6.1.1 (Demo Script & Seed Data) → 6.1.2 (Demo Rehearsal) → 6.2.2 (Final Retrospective & Submission) → **Milestone M6 (Dec 16)**.
 
 **Float / Slack Analysis:** Non-critical paths possess flexible schedule float to absorb variances:
 * Hardware & Environment (1.2.4): 2 days float.
@@ -427,7 +427,7 @@ The Critical Path (CP) represents the sequence of dependent work packages that d
 * Reader Dashboard (5.2.7): 3 days float before system test freeze.
 * Presentation Slides (6.2.1): 2 days float before final delivery.
 
-**Total Critical Path Duration:** 67 calendar days across the 11-week academic period.
+**Total Critical Path Duration:** 63 calendar days across 9 weeks (from 2026-10-15 to 2026-12-16).
 
 5. ## **Roles and Responsibilities**
 
