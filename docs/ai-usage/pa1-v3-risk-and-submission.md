@@ -1,0 +1,23 @@
+# PA1-V3 AI Usage Record
+
+- Date: 2026-10-21
+- Member: Nguyễn Phan Thế Vinh (Team lead / PM · Tester)
+- Tool: Google DeepMind Agent (Antigravity AI)
+- Purpose: Complete Section 5 Risk Management with quantitative Probability, Loss, and Risk Exposure ($RE = P \times L$), consolidate the Master AI Usage Log across all 4 team members (Section 7), update Section 1 Member Contribution with task board/commit evidence, and execute the Phase Gate M1 GO/NO-GO review for PA1 submission.
+- Output:
+  - Formulated Section 5.1 Risk Measurement Scale (Probability 1–5, Loss 1–5, Risk Exposure 1–25) based on standard Software Engineering methodologies.
+  - Authored Section 5.2 Master Risk Register Table with 6 detailed risks covering all 5 required categories (Technology, People, Organisational, Requirements, Estimation), including domain-specific risks on BookCopy/Loan/Reservation state consistency and cloud deployment/database expiration.
+  - Consolidated Section 7 Master AI Usage Log with 7 comprehensive entries covering all four members (Vinh, Quân, Ánh, Nguyên), specific AI tools, prompts/tasks, and explicit verification/modification records.
+  - Finalized Section 1 Member Contribution Assessment with 25% equal allocation across all 4 members, supported by explicit links to task board issues (#6–#74), pull requests (#2, #75, #76, #77, #78, #79), and repository documents.
+  - Conducted Phase Gate M1 GO/NO-GO review checklist and established Moodle submission package instructions.
+- Verification:
+  - Validated risk exposure calculations ($RE = P \times L$) and ensured mitigation strategies directly address PA0 open questions and constraints.
+  - Verified that all 4 team members' AI tool usages are disclosed in compliance with course GenAI policy.
+  - Confirmed 100% total contribution sum and verified unanimous team consensus per the Team Contract.
+  - Verified repository CI status, directory structure completeness, and document integrity across Markdown and DOCX/PDF formats.
+- Corrections and findings:
+  - Synced missing team member names and evidence in DOCX/Markdown contribution tables.
+  - Resolved empty placeholder in Section 5 with 6 concrete, actionable risk management strategies.
+  - Added explicit contingency strategies for database expiration (idempotent seed scripts + $14 Render buffer) and presentation reliability (rehearsed backup recording).
+- Remaining: Final peer review sign-off by Business Analyst (Nguyễn) and Designer (Ánh) before official Moodle upload.
+- Handoff: Ready for team review, PR creation, and Moodle submission.
