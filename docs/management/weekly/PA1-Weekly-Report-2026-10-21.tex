@@ -1,0 +1,156 @@
+% Compile with XeLaTeX (twice) or Tectonic. UTF-8 source.
+% Self-contained: no external figures, bibliography, or private assets.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=19mm,top=18mm,bottom=19mm]{geometry}
+\usepackage{fontspec}
+\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{\setmainfont{TeX Gyre Termes}}
+\IfFontExistsTF{Arial}{\setsansfont{Arial}}{\setsansfont{TeX Gyre Heros}}
+\usepackage[table]{xcolor}
+\usepackage{array,tabularx,booktabs,enumitem,fancyhdr,titlesec}
+\usepackage{hyperref}
+\definecolor{ink}{HTML}{18374B}
+\definecolor{pale}{HTML}{EEF3F6}
+\definecolor{amber}{HTML}{8A5100}
+\hypersetup{colorlinks=true,urlcolor=ink,linkcolor=ink,pdftitle={UniLib PA1 Weekly Status Report, 15-21 October 2026},pdfauthor={Team T05}}
+\urlstyle{same}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.18}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\setlist[itemize]{leftmargin=*,nosep,topsep=3pt}
+\titleformat{\section}{\sffamily\bfseries\large}{\thesection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{4pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\sffamily UniLib / Team T05}
+\fancyhead[R]{\small\sffamily PA1 weekly status}
+\fancyfoot[L]{\footnotesize Reporting cutoff: 21 October 2026 (ICT)}
+\fancyfoot[R]{\footnotesize\thepage\ / 3}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{14pt}
+\newcommand{\src}[2]{\href{https://github.com/Vincenthevinh/UniLib/blob/0a1ed17/#1}{#2}}
+\newcommand{\pr}[1]{\href{https://github.com/Vincenthevinh/UniLib/pull/#1}{PR \##1}}
+\begin{document}
+\thispagestyle{empty}
+{\sffamily\small UNIVERSITY OF SCIENCE \enspace / \enspace INTRODUCTION TO SOFTWARE ENGINEERING}
+
+\vspace{7pt}
+{\sffamily\bfseries\LARGE UniLib Weekly Status Report}\par
+{\sffamily\large PA1 --- Project Proposal \& Plan}
+
+\vspace{5pt}
+\begin{tabularx}{\textwidth}{@{}P{28mm}YP{28mm}Y@{}}
+\textbf{Team} & T05 & \textbf{Report date} & 21 October 2026 \\
+\textbf{Period} & 15--21 October 2026 & \textbf{Phase deadline} & 21 October 2026 \\
+\textbf{Course week} & Week 3 in PA0 / task plan & \textbf{Repository} & \texttt{main @ 0a1ed17} \\
+\textbf{Report owner} & Nguyễn Phan Thế Vinh (PM) & \textbf{Review} & Team review pending \\
+\end{tabularx}
+
+\section{Overall status and weekly objective}
+\textbf{\textcolor{amber}{AMBER --- PA1 closure remains at risk.}} Planning and repository artifacts have advanced, but the risk register, document consistency, and collaboration controls still require closure. Submission and team sign-off are not evidenced in the reviewed files.
+
+The weekly objective was to prepare the PA1 planning package: vision and scope, preliminary solution, phase gates, WBS, effort and cost estimates, schedule/Gantt, roles, risks, and collaboration setup. The agreed scope remains F01--F06: authentication/roles, catalog, physical copies, search, borrow/return, and reservations. Application implementation belongs to a later phase.
+
+\section{Progress and deliverables this period}
+{\small
+\begin{tabularx}{\textwidth}{@{}P{30mm}YP{33mm}@{}}
+\toprule
+\rowcolor{pale}\textbf{Workstream / task} & \textbf{Result and evidence} & \textbf{Status at cutoff} \\
+\midrule
+Governance / V1 & Kickoff minutes dated 15 October record all four members present, primary/backup roles, phase gates, and task allocation. WBS contains 69 work packages. & Recorded; baseline sign-off pending. \\
+\addlinespace[3pt]
+Vision / N1--N2 & DOCX contains the problem statement, positioning, stakeholders, F01--F06, and scope exclusions. Corresponding Markdown sections still contain template placeholders. & Draft available; sources need synchronization. \\
+\addlinespace[3pt]
+Planning / V2 & \pr{76} added estimation, schedule, and budget. \pr{78} revised phase dates. WBS/manifest total is 318 person-hours. & Authored; schedule feasibility requires review. \\
+\addlinespace[3pt]
+Architecture / A1--A2 & \pr{77} added PA1 document updates; current DOCX includes architecture graphics and operating environment. \texttt{Gantt\_Chart.xlsx} is tracked. & Artifacts present; diagram source, review, and date alignment need confirmation. \\
+\addlinespace[3pt]
+Tooling / Q1--Q2 & \pr{5} and \pr{75} merged repository standards, CI, stack proposal, and WBS issue mapping. JSON includes due dates for all 69 packages. & Repository setup present; live Project and access controls unverified. \\
+\addlinespace[3pt]
+Closure / V3, N3, A3, Q3 & AI logs and submission source files exist. This weekly report adds the PA1 status record. Risk Management remains a template; final PA1 PDF is absent from \texttt{main}. & Open; final review and submission evidence required. \\
+\bottomrule
+\end{tabularx}}
+
+\vfill
+{\footnotesize Task labels V1--Q3 follow the team planning page. Status describes artifact evidence and does not imply approval, actual hours, or Moodle submission.}
+
+\newpage
+\section{Member activity and effort snapshot}
+{\small
+\begin{tabularx}{\textwidth}{@{}P{46mm}YP{22mm}@{}}
+\toprule
+\rowcolor{pale}\textbf{Member / role} & \textbf{Weekly activity evidenced in project artifacts} & \textbf{PA1 plan (h)} \\
+\midrule
+Nguyễn Phan Thế Vinh\newline 23127520 / PM, Tester & Kickoff, role alignment, phase gates, WBS, estimation, schedule and cost model; risk and final baseline closure remain open. & 26 \\
+Nguyễn Thanh Thảo Nguyên\newline 24127469 / BA & Vision, stakeholders and MoSCoW content appear in DOCX; Markdown integration and whole-document consistency review remain pending. & 9 \\
+Vũ Thị Ánh\newline 24127324 / Designer, Architect & Architecture/environment updates and Gantt workbook are present; alignment with the revised dates and review evidence remain to be checked. & 12 \\
+Trần Hà Anh Quân\newline 24127228 / Developer & Repository skeleton/standards, CI, technology proposal, and issue mapping; Project configuration and administrator checks remain open. & 7 \\
+\midrule
+\textbf{Total} & \textbf{14 PA1 work packages} & \textbf{54} \\
+\bottomrule
+\end{tabularx}}
+
+These are WBS estimates, not actual weekly hours. No timesheet is available to calculate actual effort or variance. PA1 lists equal 25\% contributions; this report does not independently reassess those percentages. The kickoff record confirms 4/4 attendance on 15 October; individual attendance at the daily meetings has not been supplied.
+
+\section{Planning metrics and changes}
+{\small
+\begin{tabularx}{\textwidth}{@{}P{53mm}Y@{}}
+\toprule
+\rowcolor{pale}\textbf{Metric} & \textbf{Current planning value} \\
+\midrule
+WBS packages / estimated effort & 69 / 318 person-hours; phase totals: 54 + 60 + 56 + 41 + 91 + 16. \\
+Project effort by member & Vinh 96 h; Nguyên 54 h; Ánh 64 h; Quân 104 h. \\
+Budget model in PA1 & Labor 31,800,000 + hosting allowance 350,000 + contingency 3,215,000 = \textbf{35,365,000 VND}. These are estimates; spending is not reported. \\
+Current phase dates (Section 4.4) & PA1 21 Oct; PA2 4 Nov; PA3 18 Nov; PA4 25 Nov; PA5 9 Dec; Final 16 Dec 2026. \\
+Board evidence & Manifest has 69 issue links and 69 due dates; \texttt{project\_url} is null. JSON dates do not establish that live Project fields were updated. \\
+Implementation and testing & Source placeholder and repository CI configuration exist. No application package, application test result, or deployed UniLib application is evidenced. \\
+\bottomrule
+\end{tabularx}}
+
+\textbf{Key change:} \pr{78} moves the schedule to a nine-week window (15 October--16 December), while estimation text still assumes 11 weeks. At nine weeks, the average becomes $318/(4\times9)=8.83$ hours/person/week, above the agreed 6--8 hours. Capacity at 8 hours is 288 hours, leaving a 30-hour shortfall. Individual allocations are also uneven: Vinh 10.67 and Quân 11.56 hours/week under that window. Feasibility therefore needs a revised capacity plan.
+
+\textbf{Document consistency:} Section 4.1 retains older course-week labels; the V2 AI log retains earlier milestone dates; the Q2 setup note still describes dates as pending. The older attached DOCX and the repository DOCX also differ. These records need one consistent, reviewed baseline.
+
+\section{Issues affecting PA1 acceptance}
+The risk register is incomplete in both the repository DOCX and Markdown. Repository settings evidence dated 19 October reports \texttt{main} unprotected and TA/instructor access unverified; current settings need fresh administrator verification. The Q2 note records issue creation, but no verified Project URL or complete assignee mapping. These gaps prevent a substantiated claim that PA1 exit criteria are satisfied.
+
+\newpage
+\section{Immediate actions and next reporting period}
+The following is a proposed follow-up plan for team review. Immediate items should be resolved before PA1 sign-off; PA2 dates below follow the current schedule and depend on acceptance of the PA1 baseline.
+
+{\small
+\begin{tabularx}{\textwidth}{@{}P{17mm}YP{29mm}P{23mm}@{}}
+\toprule
+\rowcolor{pale}\textbf{Priority} & \textbf{Action and completion evidence} & \textbf{Owner / review} & \textbf{Target} \\
+\midrule
+High & Complete at least five risk entries with probability, loss, exposure, response and owner; obtain peer review. & Vinh / Nguyên & Before PA1 sign-off \\
+\addlinespace[2pt]
+High & Reconcile nine-week schedule with effort/capacity; refresh milestone labels, JSON, DOCX and Gantt. Validate dependencies: e.g. 1.2.8 starts 18 Oct while prerequisite 1.2.7 ends 20 Oct. & Vinh + Ánh / Quân & Before PA1 sign-off \\
+\addlinespace[2pt]
+High & Verify main protection, one human approval, required CI check and TA access. Record settings/review links. & Repository admin; Quân coordinates & Before PA1 sign-off \\
+\addlinespace[2pt]
+High & Record the shared Project URL, verify 69 items, owners and approved dates; complete missing assignee mappings and stack review. & Quân / Vinh + Ánh & Before PA1 sign-off \\
+\addlinespace[2pt]
+High & Synchronize Vision/environment across DOCX and Markdown; remove placeholders; retain editable diagram source; review final export, AI log and contribution evidence; record submission receipt. & Nguyên + Ánh + Vinh / team & Before PA1 submission \\
+\addlinespace[2pt]
+Next & WBS 2.1.1: domain glossary/model covering Book Title, Book Copy, Loan, Reservation and Overdue. & Nguyên / Vinh & 22--24 Oct \\
+\addlinespace[2pt]
+Next & WBS 2.1.2: system use case model for Reader, Librarian and Administrator. & Nguyên / Ánh & 24--27 Oct \\
+\addlinespace[2pt]
+Next & Start WBS 2.2.1--2.2.2: authentication/role and catalog requirements; clarify loan limits and reservation pickup expiry. & Nguyên / Vinh & Start 27 Oct; due 30 Oct \\
+\bottomrule
+\end{tabularx}}
+
+\section{Coordination and decisions required}
+\textbf{Daily team meetings:} During the reporting period, the team held a Google Meet meeting every day at 21:00 (ICT), lasting approximately one hour (until around 22:00), to discuss project issues, clarify questions, and coordinate follow-up actions.
+
+\textbf{Decisions:} confirm the authoritative course calendar and capacity plan; approve the technology proposal; confirm the task board and TA-accessible communication channel. The team contract specifies Thursday 20:30 internal meetings, Sunday 19:30 TA meetings, and Friday 23:59 weekly reports (ICT). The next scheduled slots are 22, 25, and 23 October respectively; this report does not record those future meetings as held.
+
+\section{Evidence and AI disclosure}
+{\footnotesize
+Primary evidence is the repository at \href{https://github.com/Vincenthevinh/UniLib/tree/0a1ed17}{commit 0a1ed17}: \src{pa/PA1/PA1-ProjectProposal-Plan.md}{PA1 Markdown}, \src{pa/PA1/PA1-ProjectProposal-Plan.docx}{PA1 DOCX}, \src{pa/PA1/Gantt_Chart.xlsx}{Gantt workbook}, \src{docs/management/pa1-wbs-board.json}{WBS manifest}, \src{docs/management/kickoff-meeting-minutes.md}{kickoff minutes}, \src{docs/management/pa1-tools-setup.md}{tools verification}, \src{docs/management/pa1-q2-board-setup.md}{Q2 board note}, \src{docs/ai-usage/pa1-v2-estimation-and-schedule.md}{V2 log}, and \src{pa/PA0-ProjectIdea-TeamContract.md}{team contract}. The user-supplied \texttt{PA1-ProjectProposal-Plan.docx} was also compared as an earlier reference. The \href{https://unilib-project-plan.netlify.app/}{PA1 planning page} supplies task ownership and acceptance expectations, not proof of task completion. Daily Google Meet meeting details were confirmed by the user.
+
+OpenAI Codex assisted with source comparison, arithmetic checks and drafting/typesetting this report. Checks covered WBS totals, owner/phase allocations, dates, artifact presence and PDF layout. The report owner and team must review the status and proposed follow-up actions before approval.}
+\end{document}
