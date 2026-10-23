@@ -33,10 +33,33 @@ This document focus on the following topics:
 
    1. ## **Preliminary Problem Statement**
 
-*\[Provide an approximately 1–2 page business description of the software problem, including the operating environment (e.g., web browser supporting HTML5, cloud server) and design & implementation constraints (e.g., programming language, database, documentation standards). State the problem at a preliminary level; the detailed problem statement is presented in PA2.\]*
+### Current Situation
 
-* *Examples: https\://hackmd.io/@nndkhoa9/se-onlineauction-spec*  
-* *https\://hackmd.io/@nndkhoa9/se-healthmonitor-spec*
+Small university libraries may rely on paper-based records and spreadsheets to manage book inventories, borrowing, returns, and reservations. These methods can cause inconsistent records, delayed updates to book availability, and difficulties tracking overdue loans. Readers may need to contact library staff to confirm whether a book is available.
+
+### Problem Statement
+
+Without a centralized system, librarians may find it difficult to maintain accurate Book Title and Book Copy information, monitor Loans and Reservations, and identify Overdue items. Manual record-keeping increases administrative workload and creates risks of data duplication, missing information, and inconsistent book availability status.
+
+### Project Objectives
+
+UniLib aims to provide a centralized web-based library management system for small university libraries. It will support three user roles: Reader/Student, Librarian, and Administrator. The essential features include authentication and role management (F01), Book Title catalog management (F02), Book Copy management (F03), search and browsing (F04), borrowing and returning (F05), and book reservations (F06).
+
+### Operating Environment
+
+UniLib will operate through modern HTML5-compatible web browsers on desktop and laptop computers. The proposed system uses React for the frontend, Node.js with Express for REST API services, and PostgreSQL for data storage. The frontend is planned for deployment on Vercel, while backend services and the database are planned for deployment on Render.
+
+### Design and Implementation Constraints
+
+The project follows the Waterfall development process and the approved PA0 scope. Git and GitHub will be used for version control and team collaboration. The initial release will not include e-books or DRM, online payment, RFID/barcode scanners, interlibrary services, AI recommendations, production SMS/email notifications, native mobile applications, or large-scale distributed deployment. Detailed functional requirements and system designs will be addressed in later project phases.
+
+### Glossary
+
+- **Book Title:** A catalog record containing bibliographic information about a book.
+- **Book Copy:** An individual physical copy associated with a Book Title.
+- **Loan:** A record of a Reader borrowing a Book Copy with an assigned due date.
+- **Reservation:** A request from a Reader to reserve a book for future borrowing, subject to library rules.
+- **Overdue:** A Loan whose due date has passed while the borrowed Book Copy remains unreturned.
 
   2. ## **Product Position Statement**
 
