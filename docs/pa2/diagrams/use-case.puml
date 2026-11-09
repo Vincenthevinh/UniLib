@@ -1,0 +1,64 @@
+@startuml
+title UniLib PA2 - Use Case Model (F01-F07)
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam actorStyle awesome
+skinparam backgroundColor white
+skinparam usecase {
+  BorderColor #314E61
+  BackgroundColor #F5FAFD
+  ArrowColor #314E61
+}
+
+actor Reader as R
+actor Librarian as L
+actor Administrator as A
+
+rectangle "UniLib - University Library Management System" {
+  usecase "UC-01\nLog In & Manage Session" as UC01
+  usecase "UC-02\nManage User Accounts" as UC02
+  usecase "UC-03\nManage Book Catalog" as UC03
+  usecase "UC-04\nManage Book Copies" as UC04
+  usecase "UC-05\nSearch & Browse Catalog" as UC05
+  usecase "UC-06\nView Book Details" as UC06
+  usecase "UC-07\nBorrow Book (Checkout)" as UC07
+  usecase "UC-08\nReturn Book (Check-in)" as UC08
+  usecase "UC-09\nRenew Book Loan" as UC09
+  usecase "UC-10\nReserve Book Title" as UC10
+  usecase "UC-11\nCancel Reservation /\nProcess Hold Expiry" as UC11
+  usecase "UC-12\nDashboard & Overdue Desk\n(Should-have F07)" as UC12
+}
+
+R -- UC01
+L -- UC01
+A -- UC01
+A -- UC02
+L -- UC03
+L -- UC04
+R -- UC05
+L -- UC05
+R -- UC06
+L -- UC06
+L -- UC07
+L -- UC08
+R -- UC09
+L -- UC09
+R -- UC10
+R -- UC11
+L -- UC11
+R -- UC12
+L -- UC12
+
+UC06 ..> UC05 : <<extend>>
+UC10 ..> UC06 : <<extend>>
+
+note bottom of UC11
+  Time-based expiry is an internal system trigger,
+  not an external human actor.
+end note
+note bottom of UC07
+  Authentication is a precondition, not
+  a mandatory included user goal.
+end note
+@enduml
