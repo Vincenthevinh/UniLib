@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Check README
         run: test -s README.md
@@ -38,38 +38,60 @@ jobs:
             exit "$status"
           fi
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
+  server-ci:
+    name: server-ci (src/server)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'src/server/package-lock.json'
 
-      - name: Check application packages if present
-        shell: bash
-        run: |
-          set -euo pipefail
-          found=0
+      - name: Install server dependencies
+        working-directory: src/server
+        run: npm ci
 
-          # Provisional paths; update after the team confirms the architecture.
-          for dir in frontend backend; do
-            if [ -f "$dir/package.json" ]; then
-              found=1
-              (
-                cd "$dir"
+      - name: Run server linter
+        working-directory: src/server
+        run: npm run lint
 
-                if [ ! -f package-lock.json ]; then
-                  echo "Missing package-lock.json in $dir"
-                  exit 1
-                fi
+      - name: Run server test suite
+        working-directory: src/server
+        run: npm test
 
-                npm ci
-                npm run lint --if-present
-                npm test --if-present
-                npm run build --if-present
-              )
-            fi
-          done
+  client-ci:
+    name: client-ci (src/client)
+    runs-on: ubuntu-latest
 
-          if [ "$found" -eq 0 ]; then
-            echo "No application packages yet."
-            echo "Repository checks only."
-          fi
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'src/client/package-lock.json'
+
+      - name: Install client dependencies
+        working-directory: src/client
+        run: npm ci
+
+      - name: Run client linter
+        working-directory: src/client
+        run: npm run lint
+
+      - name: Run client test suite
+        working-directory: src/client
+        run: npm test
+
+      - name: Build client production bundle
+        working-directory: src/client
+        run: npm run build
