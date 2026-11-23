@@ -1,0 +1,63 @@
+// Source for dbdiagram.io; matches src/server/prisma/schema.prisma.
+Enum Role { Reader Librarian Administrator }
+Enum CopyStatus { Available Borrowed Reserved Damaged Lost }
+Enum ReservationStatus { Pending Ready Fulfilled Cancelled Expired }
+
+Table users {
+  id uuid [pk]
+  username varchar(80) [unique, not null]
+  email varchar(255) [unique, not null]
+  fullName varchar(160) [not null]
+  password_hash varchar(255) [not null]
+  role Role [not null]
+  is_active boolean [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+Table book_titles {
+  id uuid [pk]
+  isbn varchar(32) [unique, not null]
+  title varchar(300) [not null]
+  author varchar(300) [not null]
+  category varchar(100) [not null]
+  publisher varchar(160)
+  publication_year smallint [not null]
+  is_active boolean [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+}
+Table book_copies {
+  id uuid [pk]
+  title_id uuid [not null, ref: > book_titles.id]
+  barcode varchar(80) [unique, not null]
+  shelf_location varchar(100) [not null]
+  condition_notes text
+  status CopyStatus [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  Indexes { (title_id, status) }
+}
+Table loans {
+  id uuid [pk]
+  reader_id uuid [not null, ref: > users.id]
+  copy_id uuid [not null, ref: > book_copies.id]
+  checked_out_at timestamptz [not null]
+  due_at timestamptz [not null]
+  returned_at timestamptz
+  renewed_at timestamptz
+  Indexes { (reader_id, returned_at) (copy_id, returned_at) }
+}
+Table reservations {
+  id uuid [pk]
+  reader_id uuid [not null, ref: > users.id]
+  title_id uuid [not null, ref: > book_titles.id]
+  held_copy_id uuid [ref: > book_copies.id]
+  status ReservationStatus [not null]
+  created_at timestamptz [not null]
+  ready_at timestamptz
+  expires_at timestamptz
+  fulfilled_at timestamptz
+  cancelled_at timestamptz
+  Indexes { (title_id, created_at) (reader_id, status) }
+}
+// Migration adds partial unique indexes for active loans, holds, and active same-title reservations.

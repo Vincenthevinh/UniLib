@@ -1,0 +1,15 @@
+flowchart TB
+  spa["React/Vite SPA"] --> routes["Express Routes (HTTP contracts)"]
+  routes --> auth["JWT/RBAC Middleware - F01 Vinh"]
+  routes --> catalog["CatalogService - F02/F03/F04 Quan"]
+  routes --> reservation["ReservationService - F06 Quan"]
+  routes --> circulation["LoanService - F05 Vinh"]
+  routes --> dashboard["DashboardService - F07 Vinh"]
+  timer["Expiry Timer"] --> reservation
+  circulation -->|allocateNextHold / fulfillHeldReservation| reservation
+  catalog --> prisma["Prisma Client / Repository Layer"]
+  reservation --> prisma
+  circulation --> prisma
+  dashboard --> prisma
+  auth --> prisma
+  prisma --> db[("PostgreSQL 16")]

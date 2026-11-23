@@ -1,0 +1,7 @@
+flowchart LR
+  reader["Reader / Patron"] -->|Search, reserve, dashboard| unilib["UniLib Library System"]
+  librarian["Librarian"] -->|Catalog, copies, circulation, holds| unilib
+  admin["Administrator"] -->|Manage accounts| unilib
+  unilib -->|Stores library data| db[("PostgreSQL 16")]
+  note["No external payment, SMS, RFID, AI services in PA2 scope"]
+  unilib --- note
