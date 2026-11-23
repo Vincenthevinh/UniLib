@@ -1,0 +1,23 @@
+sequenceDiagram
+  actor Reader
+  participant API as ReservationController
+  participant Auth as JWT/RBAC
+  participant Svc as ReservationService
+  participant DB as PostgreSQL
+  Reader->>API: POST /api/reservations {titleId}
+  API->>Auth: Verify JWT and Reader role
+  alt Invalid token / wrong role
+    Auth-->>Reader: 401 / 403
+  else Authorized
+    API->>Svc: placeReservation(readerId, titleId)
+    Svc->>DB: BEGIN SERIALIZABLE; lock Reader and Title rows
+    Svc->>DB: Check active, zero Available, limit, overdue, duplicate title
+    alt Eligibility violation
+      DB-->>Svc: Disallowed
+      Svc-->>Reader: 422 {error:{code,message}} (ROLLBACK)
+    else Eligible
+      Svc->>DB: INSERT Pending reservation, FIFO by createdAt and id
+      Svc->>DB: COMMIT
+      Svc-->>Reader: 201 {reservation,queuePosition}
+    end
+  end

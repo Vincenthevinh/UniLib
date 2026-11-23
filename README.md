@@ -31,10 +31,18 @@ git clone https://github.com/Vincenthevinh/UniLib.git
 cd UniLib
 ```
 
-The repository currently contains planning documents and repository tooling.
-There is no application to install, run, or deploy yet. Application setup
-instructions will be added after architecture confirmation. `src/` is a placeholder
-for the template's source directory; its internal structure is not decided yet.
+The W1 backend implementation now lives in src/server. Start local PostgreSQL 16 and
+the Express API from the repository root using:
+
+    docker compose up --build -d
+
+The API health endpoint is http://127.0.0.1:18081/api/health. PostgreSQL is
+published on localhost:55432 (container port 5432). Populate a clean database
+with docker compose exec -T api npm run db:seed. To recreate disposable demo
+data, run docker compose exec -T api npm run db:reset (destructive).
+The React/Vite client and F01/F05/F07 integration belong to other team members
+and are not yet part of this feature branch. See src/server/README.md for tests,
+demo credentials, and the API integration contract.
 
 ## Collaboration Workflow
 

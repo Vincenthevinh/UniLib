@@ -1,0 +1,15 @@
+flowchart LR
+  r["Reader / Librarian / Admin"] -->|HTTPS| spa["React + Vite SPA"]
+  spa -->|JSON REST / Bearer JWT| api["Node 22 + Express API"]
+  api -->|Prisma ORM / SQL transactions| db[("PostgreSQL 16")]
+  scheduler["Internal expiry timer"] -->|sweep due holds| api
+  subgraph Client
+  spa
+  end
+  subgraph Server
+  api
+  scheduler
+  end
+  subgraph Storage
+  db
+  end
