@@ -12,7 +12,7 @@ import {
 
 import { checkDatabaseHealth } from './src/config/dbHealth.js';
 
-// Module routes
+// Module routes (PA2 V1 Skeleton modules)
 import authRoutes from './src/modules/auth/auth.routes.js';
 import usersRoutes from './src/modules/users/users.routes.js';
 import booksRoutes from './src/modules/books/books.routes.js';
@@ -21,7 +21,12 @@ import loansRoutes from './src/modules/loans/loans.routes.js';
 import reservationsRoutes from './src/modules/reservations/reservations.routes.js';
 import dashboardRoutes from './src/modules/dashboard/dashboard.routes.js';
 
-const app = express();
+// Integrated service routers (F02/F03/F06 feature contracts)
+import { booksRouter } from './routes/books.js';
+import { copiesRouter } from './routes/copies.js';
+import { reservationsRouter } from './routes/reservations.js';
+
+export const app = express();
 
 // Security middlewares
 app.disable('x-powered-by');
@@ -31,6 +36,7 @@ app.use(
   cors({
     origin: env.CORS_ORIGIN,
     credentials: true,
+    optionsSuccessStatus: 204,
   })
 );
 
@@ -64,7 +70,12 @@ app.get('/api/health', async (req, res, next) => {
   }
 });
 
-// API routes
+// Primary feature API routes
+app.use('/api/books', booksRouter);
+app.use('/api/copies', copiesRouter);
+app.use('/api/reservations', reservationsRouter);
+
+// Versioned modular API routes (Skeleton & Extended)
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/books', booksRoutes);
