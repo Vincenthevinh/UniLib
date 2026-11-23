@@ -1,3 +1,5 @@
+import { HttpError } from '../../lib/errors.js';
+
 /**
  * Custom application error class to carry HTTP status, error codes, and details.
  */
@@ -25,6 +27,55 @@ export class AppError extends Error {
  * Never leaks stack traces to client responses.
  */
 export function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-vars
+  // Handle HttpError from lib/errors.js
+  if (err instanceof HttpError) {
+    return res.status(err.status).json({
+      error: {
+        code: err.code,
+        message: err.message,
+        details: err.details ?? null,
+      },
+    });
+  }
+
+  // Handle Prisma known request errors
+  if (err?.code === 'P2002') {
+    return res.status(409).json({
+      error: {
+        code: 'DUPLICATE_RESOURCE',
+        message: 'A unique value already exists',
+        details: null,
+      },
+    });
+  }
+  if (err?.code === 'P2003') {
+    return res.status(409).json({
+      error: {
+        code: 'REFERENTIAL_CONFLICT',
+        message: 'Record is still referenced',
+        details: null,
+      },
+    });
+  }
+  if (err?.code === 'P2034') {
+    return res.status(409).json({
+      error: {
+        code: 'CONCURRENT_MODIFICATION',
+        message: 'Please retry after refreshing current state',
+        details: null,
+      },
+    });
+  }
+  if (err?.code === 'P2025') {
+    return res.status(404).json({
+      error: {
+        code: 'NOT_FOUND',
+        message: 'Record not found',
+        details: null,
+      },
+    });
+  }
+
   const statusCode = typeof err.statusCode === 'number'
     ? err.statusCode
     : (typeof err.status === 'number' ? err.status : 500);
