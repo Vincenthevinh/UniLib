@@ -1,22 +1,82 @@
-import "dotenv/config";
-import express from "express";
-import cors from "cors";
-import { prisma } from "./db.js";
-import { errorHandler, asyncHandler } from "./lib/errors.js";
-import { booksRouter } from "./routes/books.js";
-import { copiesRouter } from "./routes/copies.js";
-import { reservationsRouter } from "./routes/reservations.js";
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
 
-export const app = express();
-app.disable("x-powered-by");
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || "http://localhost:5173" }));
-app.use(express.json({ limit: "50kb" }));
+import env from './config/env.js';
+import {
+  requestId,
+  errorHandler,
+  notFound,
+} from './src/middlewares/index.js';
 
-app.get("/api/health", asyncHandler(async (_req, res) => {
-  await prisma.$queryRawUnsafe("SELECT 1");
-  res.json({ status: "ok" });
-}));
-app.use("/api/books", booksRouter);
-app.use("/api/copies", copiesRouter);
-app.use("/api/reservations", reservationsRouter);
+import { checkDatabaseHealth } from './src/config/dbHealth.js';
+
+// Module routes
+import authRoutes from './src/modules/auth/auth.routes.js';
+import usersRoutes from './src/modules/users/users.routes.js';
+import booksRoutes from './src/modules/books/books.routes.js';
+import copiesRoutes from './src/modules/copies/copies.routes.js';
+import loansRoutes from './src/modules/loans/loans.routes.js';
+import reservationsRoutes from './src/modules/reservations/reservations.routes.js';
+import dashboardRoutes from './src/modules/dashboard/dashboard.routes.js';
+
+const app = express();
+
+// Security middlewares
+app.disable('x-powered-by');
+app.use(helmet());
+
+app.use(
+  cors({
+    origin: env.CORS_ORIGIN,
+    credentials: true,
+  })
+);
+
+// Request parsing
+app.use(express.json({ limit: '50kb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// Request tracking
+app.use(requestId);
+
+// HTTP Logging (suppressed in test environment)
+if (env.NODE_ENV !== 'test') {
+  app.use(
+    morgan(
+      ':method :url :status :res[content-length] - :response-time ms [req-id: :req[x-request-id]]'
+    )
+  );
+}
+
+// Health check endpoint
+app.get('/api/health', async (req, res, next) => {
+  try {
+    const dbStatus = await checkDatabaseHealth();
+
+    res.status(200).json({
+      status: 'ok',
+      db: dbStatus,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// API routes
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', usersRoutes);
+app.use('/api/v1/books', booksRoutes);
+app.use('/api/v1/copies', copiesRoutes);
+app.use('/api/v1/loans', loansRoutes);
+app.use('/api/v1/reservations', reservationsRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
+
+// Handle unknown endpoints
+app.use(notFound);
+
+// Centralized error handling
 app.use(errorHandler);
+
+export default app;

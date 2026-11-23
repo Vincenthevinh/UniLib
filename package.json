@@ -1,0 +1,17 @@
+{
+  "name": "unilib-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "UniLib - University Library Management System",
+  "scripts": {
+    "dev": "npm --prefix src/server run dev",
+    "dev:server": "npm --prefix src/server run dev",
+    "dev:client": "npm --prefix src/client run dev",
+    "test:server": "npm --prefix src/server test",
+    "test:client": "npm --prefix src/client test",
+    "test": "npm --prefix src/server test && npm --prefix src/client test",
+    "lint:server": "npm --prefix src/server run lint",
+    "lint:client": "npm --prefix src/client run lint",
+    "lint": "npm --prefix src/server run lint && npm --prefix src/client run lint"
+  }
+}
