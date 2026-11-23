@@ -1,0 +1,7 @@
+flowchart LR
+  browser["Reader/Librarian/Admin Browser"] -->|HTTPS| vercel["Vercel: React/Vite Static SPA"]
+  vercel -->|HTTPS JSON + JWT| render["Render: Node 22 Express API Container"]
+  render -->|PostgreSQL TLS / Prisma| postgres[("Managed PostgreSQL 16")]
+  timer["Same API process: 60 s hold expiry timer"] --> render
+  env["Secrets: DATABASE_URL, JWT_SECRET, CLIENT_ORIGIN"] -.-> render
+  dev["Local: docker compose db + api"] -.-> render

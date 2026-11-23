@@ -33,3 +33,17 @@ PA AI Usage Log entry:
 ## Evidence
 
 Screenshots, test output, or related links:
+
+## PA2 SRS Traceability (when applicable)
+
+Frozen requirement IDs (FR/NFR/BR):
+Related use case(s) and screen(s):
+Source of truth: pa/PA2/00-id-registry.md
+
+- [ ] IDs match the frozen registry; proposed changes have PM-approved CRs
+- [ ] UC main flow, alternate flow, error cases, postconditions and linked ACs are reviewed
+- [ ] Diagram sources and rendered assets are synchronized
+- [ ] Cross-owner changes have explicit owner agreement
+- [ ] Evidence is attached; passing tests are not claimed for documentation-only changes
+
+Reviewer approval / link:
