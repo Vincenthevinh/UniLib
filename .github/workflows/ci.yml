@@ -55,7 +55,7 @@ jobs:
 
       - name: Install server dependencies
         working-directory: src/server
-        run: npm ci
+        run: npm install
 
       - name: Run server linter
         working-directory: src/server
