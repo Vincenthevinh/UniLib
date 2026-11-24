@@ -1,0 +1,17 @@
+digraph G {
+ graph [rankdir=TB, bgcolor="white", nodesep=0.5, ranksep=0.85, splines=polyline, pad=0.2];
+ node [shape=box, fontname="DejaVu Sans", fontsize=12, style="rounded,filled", color="#6082aa", fillcolor="#edf3fc", penwidth=1.2];
+ edge [fontname="DejaVu Sans", fontsize=10, color="#5a7393", arrowsize=0.7];
+ User; Reader; Librarian; Administrator; BookTitle; BookCopy; Loan; Reservation;
+ {rank=same; Reader; Librarian; Administrator;}
+ {rank=same; BookTitle; BookCopy; Loan; Reservation;}
+ Reader -> User [arrowhead=empty, label="role"];
+ Librarian -> User [arrowhead=empty, label="role"];
+ Administrator -> User [arrowhead=empty, label="role"];
+ BookTitle -> BookCopy [label="1 : 0..*", dir=none];
+ Reader -> Loan [label="1 : 0..*", dir=none];
+ BookCopy -> Loan [label="1 : 0..*", dir=none];
+ Reader -> Reservation [label="1 : 0..*", dir=none];
+ BookTitle -> Reservation [label="1 : 0..*", dir=none];
+ BookCopy -> Reservation [label="0..1 : 0..* (history)", style=dashed, dir=none];
+}
