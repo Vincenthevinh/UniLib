@@ -12,7 +12,17 @@ describe('UniLib Client App Shell', () => {
 
   it('renders application header and title', async () => {
     render(<App />);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('UniLib — University Library Management System');
+    const h1List = screen.getAllByRole('heading', { level: 1 });
+    expect(h1List[0]).toHaveTextContent('UniLib — University Library Management System');
+    await waitFor(() => {
+      expect(screen.getByTestId('backend-status')).toHaveTextContent('ok');
+    });
+  });
+
+  it('renders role shell navigation and SCR-01 login placeholder by default', async () => {
+    render(<App />);
+    expect(screen.getByRole('navigation', { name: /Quick role preview/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/SCR-01/).length).toBeGreaterThan(0);
     await waitFor(() => {
       expect(screen.getByTestId('backend-status')).toHaveTextContent('ok');
     });
