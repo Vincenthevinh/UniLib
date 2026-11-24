@@ -1,0 +1,19 @@
+@startuml
+title UniLib PA3 — Borrow — UC-07
+autonumber
+skinparam shadowing false
+participant "Librarian" as p0
+participant "SCR-07" as p1
+participant "F05 API" as p2
+participant "Circulation logic" as p3
+participant "PostgreSQL" as p4
+p0 -> p1 : Enter reader ID + copy barcode
+p1 -> p2 : Check eligibility / checkout (routes TBD)
+p2 -> p3 : Revalidate BR-01 / BR-04 / copy availability
+p3 -> p4 : Atomic active loan and copy status update
+p2 -> p1 : Success: dueAt or business error
+p1 --> p2 : result
+note over p0,p4
+alt: blocked loan limit, overdue or unavailable copy; do not assert method names without Vinh's source.
+end note
+@enduml
