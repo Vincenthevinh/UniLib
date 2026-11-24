@@ -276,3 +276,27 @@ classDiagram
 | SCR-04 | UC-04 | BookCopy | GET/POST /api/books/:id/copies; PATCH/DELETE /api/copies/:id (Quân confirmed) |
 
 **Design caveats:** F01 `api.users.*` is provisional in the N1 API adapter. The UI's Authors field maps to the Q1 schema's single `author` string (not a separate authors table). The physical scanner remains out of scope. Account password management, status transition enforcement and atomic circulation decisions remain on the backend. Exact backend method names in C1–C7 require review of source before final baseline.
+
+## 4.4 Sequence Diagram — UC-01 Login (N3-W1)
+
+- Diagram source: `docs/design/uml/seq-uc01.mmd`.
+- Export: `docs/design/uml/seq-uc01.png`.
+- Participants: User, SCR-01 Login UI, AuthController, AuthService, Prisma/PostgreSQL.
+- Main flow: credentials -> authentication -> JWT -> role-specific landing.
+- Alternative flows: incorrect password and inactive account.
+- The URI `/api/auth/login`, exact inactive-account HTTP status/error code, backend `login()` method, and login response payload are **provisional pending Vinh**. The diagram must be compared with F01 implementation before PA3 sign-off.
+- F01 requirement: JWT claims `sub` and `role`; authorization is verified against the persisted User record per request. No password hash is returned to frontend.
+
+## 4.6 Design Principles and Patterns (N3-W1)
+
+| Principle / Pattern | Where in code | Rationale and status |
+|---|---|---|
+| Layered architecture | `src/client/src/pages/librarian/{Borrow,Return,HoldShelf,Overdue}.jsx` -> `src/client/src/api/endpoints.js` -> `src/client/src/api/client.js` -> Express route/service -> Prisma | Pages render results; backend owns domain changes. Confirmed Q2 architectural style. |
+| Repository / Data Mapper (Prisma) | `src/server/prisma/schema.prisma`; Prisma Client used by server services | Encapsulates database operations behind service layer; details of implementation require source review. |
+| Service layer | `src/server/services/reservations.js` (`allocateNextHold`, `fulfillHeldReservation` confirmed integration names); Vinh-owned F05 circulation service | Keeps BR-01/02/04/07/08 state changes transactional; F05 exact method names require verification. |
+| Middleware chain | `src/server/middleware/auth.js` (temporary) and Express route chain | Authentication 401 and RBAC 403 separated; replace temporary adapter with Vinh's authoritative F01. |
+| Strategy (design proposal) | `[TBD: locate actual borrowing policy strategy module]`; future policy helper inside LoanService, **not implemented by N3** | Could separate policy evaluation without expanding F01–F07. Do not claim an implemented Strategy class. |
+| Observer / Scheduler (timer polling, not GoF Observer) | Quân's W1 60-second reservation expiry process in API; `[TBD: exact file path]` | Expires Ready holds after 72h. Timer polling is scheduler logic, not proof of a GoF Observer implementation. |
+| UI adapter / error mapping | `src/client/src/pages/librarian/circulationUtils.js`, `src/client/src/api/client.js` | Converts standardized `{error:{code,message}}` into actionable BR-specific messages. |
+
+**Status / risks:** F05 and F07 frontend paths are provisional. SCR-10 is a functional mock design draft awaiting Ánh's approval, not approved Figma. Browser-only availability/eligibility previews are advisory; backend revalidates in a transaction. Copy lookup by enumerating catalog copies is suitable only for W1 mock demonstrations and must be replaced with an agreed barcode lookup API before live use. No SMS/email integration is included.

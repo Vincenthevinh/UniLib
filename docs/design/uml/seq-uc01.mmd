@@ -1,0 +1,27 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant UI as SCR-01 Login UI
+    participant API as AuthController (proposed)
+    participant Auth as AuthService (Vinh-owned)
+    participant DB as Prisma/PostgreSQL
+    User->>UI: Enter username and password
+    UI->>API: POST /api/auth/login (PROVISIONAL route)
+    API->>Auth: login(credentials) (verify actual method)
+    Auth->>DB: Look up User, password hash and isActive
+    DB-->>Auth: User account or not found
+    alt Invalid credentials
+        Auth-->>API: INVALID_CREDENTIALS
+        API-->>UI: 401 {error:{code,message}}
+        UI-->>User: Show generic credential error
+    else Account inactive
+        Auth-->>API: ACCOUNT_INACTIVE (code TBD)
+        API-->>UI: 403/422 (TBD per Vinh contract)
+        UI-->>User: Explain inactive account
+    else Valid active account
+        Auth->>Auth: Verify bcrypt hash; sign JWT with sub and role
+        Auth-->>API: JWT and safe User profile
+        API-->>UI: 200 token and profile (shape TBD)
+        UI->>UI: Store session token
+        UI-->>User: Navigate to authorized role landing screen
+    end

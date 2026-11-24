@@ -36,6 +36,7 @@ export const api = {
     remove: (id) => client.delete(`copies/${enc(id)}`),
   },
   circulation: {
+    eligibility: (readerId, barcode) => client.get('circulation/eligibility', { readerId, barcode }), // PROVISIONAL N3 F05 preview; NOT part of Vinh's confirmed API
     checkout: (readerId, copyId) => client.post('circulation/checkout', { readerId, copyId }), // PROVISIONAL F05
     checkin: (copyId, condition) => client.post('circulation/return', { copyId, condition }), // PROVISIONAL F05
     renew: (loanId) => client.post('circulation/renew', { loanId }), // PROVISIONAL F05
