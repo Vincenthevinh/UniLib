@@ -1,0 +1,110 @@
+/* NFR-07: Responsive polish across 1024px - 1920px without altering core layout */
+.reader-shell-container {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* SCR-01: Split-screen login alignment at 1024px, 1440px, 1920px */
+.login-split-layout {
+  display: grid;
+  grid-template-columns: minmax(360px, 45fr) minmax(420px, 55fr);
+  min-height: 100vh;
+  align-items: stretch;
+}
+
+.login-form-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+/* SCR-05: Filter toolbar & 3-column result grid */
+.catalog-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(240px, 2fr) repeat(3, minmax(160px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.catalog-results-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.catalog-card,
+.catalog-item {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* SCR-06: Two-column book detail & 4 copy stat cards */
+.book-detail-header {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.copy-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+/* Tables & modal action buttons */
+.table-responsive-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+/* Laptop / tablet-landscape check around 1024px */
+@media (max-width: 1180px) {
+  .reader-shell-container {
+    padding: 16px;
+  }
+
+  .login-split-layout {
+    grid-template-columns: minmax(300px, 42fr) minmax(360px, 58fr);
+  }
+
+  .catalog-filter-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .catalog-results-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .book-detail-header {
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+
+/* Wide desktop 1920px cap so line length and cards stay balanced */
+@media (min-width: 1600px) {
+  .reader-shell-container {
+    max-width: 1600px;
+    padding: 32px;
+  }
+
+  .catalog-results-grid {
+    gap: 24px;
+  }
+}
