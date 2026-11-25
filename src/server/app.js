@@ -70,6 +70,9 @@ app.get('/api/health', async (req, res, next) => {
   }
 });
 
+import { authenticate, authorize } from './src/middlewares/auth.js';
+import { dashboardController } from './src/modules/dashboard/dashboard.controller.js';
+
 // Primary feature API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
@@ -77,6 +80,9 @@ app.use('/api/books', booksRouter);
 app.use('/api/copies', copiesRouter);
 app.use('/api/loans', loansRoutes);
 app.use('/api/reservations', reservationsRouter);
+app.get('/api/me/dashboard', authenticate, authorize('Reader'), dashboardController.getReader);
+app.get('/api/librarian/overdue', authenticate, authorize('Librarian'), dashboardController.getOverdue);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Versioned modular API routes (Skeleton & Extended)
 app.use('/api/v1/auth', authRoutes);

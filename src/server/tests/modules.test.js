@@ -11,6 +11,9 @@ const mockPrisma = {
   loan: {
     findMany: jest.fn(),
   },
+  reservation: {
+    findMany: jest.fn(),
+  },
 };
 jest.unstable_mockModule('../db.js', () => ({ prisma: mockPrisma }));
 
@@ -19,6 +22,7 @@ const request = (await import('supertest')).default;
 
 const adminId = '11111111-1111-4111-8111-111111111111';
 const librarianId = '22222222-2222-4222-8222-222222222222';
+const readerId = '44444444-4444-4444-8444-444444444444';
 const adminToken = jwt.sign(
   { sub: adminId, role: 'Administrator' },
   process.env.JWT_SECRET || env.JWT_SECRET,
@@ -29,10 +33,25 @@ const librarianToken = jwt.sign(
   process.env.JWT_SECRET || env.JWT_SECRET,
   { algorithm: 'HS256' }
 );
+const readerToken = jwt.sign(
+  { sub: readerId, role: 'Reader' },
+  process.env.JWT_SECRET || env.JWT_SECRET,
+  { algorithm: 'HS256' }
+);
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockPrisma.user.findUnique.mockImplementation(async ({ where }) => {
+    if (where?.id === readerId) {
+      return {
+        id: readerId,
+        username: 'reader1',
+        email: 'reader1@unilib.demo.invalid',
+        fullName: 'Demo Reader 1',
+        role: 'Reader',
+        isActive: true,
+      };
+    }
     if (where?.id === librarianId) {
       return {
         id: librarianId,
@@ -60,14 +79,24 @@ beforeEach(() => {
   mockPrisma.loan.findMany.mockResolvedValue([
     {
       id: '33333333-3333-4333-8333-333333333333',
-      readerId: '44444444-4444-4444-8444-444444444444',
+      readerId,
       copyId: '55555555-5555-4555-8555-555555555555',
+      checkedOutAt: new Date(Date.now() - 17 * 24 * 60 * 60 * 1000),
       dueAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       returnedAt: null,
-      reader: { id: '44444444-4444-4444-8444-444444444444', username: 'reader1', fullName: 'Demo Reader 1', email: 'reader1@unilib.demo.invalid' },
-      copy: { id: '55555555-5555-4555-8555-555555555555', barcode: 'UNI-003-01', title: { id: '66666666-6666-4666-8666-666666666666', title: 'Operating Systems', isbn: '9781000000031' } },
+      renewedAt: null,
+      reader: { id: readerId, username: 'reader1', fullName: 'Demo Reader 1', email: 'reader1@unilib.demo.invalid' },
+      copy: {
+        id: '55555555-5555-4555-8555-555555555555',
+        titleId: '66666666-6666-4666-8666-666666666666',
+        barcode: 'UNI-003-01',
+        shelfLocation: 'S-03',
+        status: 'Borrowed',
+        title: { id: '66666666-6666-4666-8666-666666666666', title: 'Operating Systems', author: 'Tanenbaum', isbn: '9781000000031' },
+      },
     },
   ]);
+  mockPrisma.reservation.findMany.mockResolvedValue([]);
 });
 
 describe('UniLib API Modules Skeletons', () => {
@@ -112,14 +141,18 @@ describe('UniLib API Modules Skeletons', () => {
   });
 
   it('GET /api/v1/reservations returns hold queue', async () => {
-    const res = await request(app).get('/api/v1/reservations');
+    const res = await request(app)
+      .get('/api/v1/reservations')
+      .set('Authorization', `Bearer ${readerToken}`);
     expect(res.status).toBe(200);
     expect(res.body.data.items.length).toBeGreaterThan(0);
     expect(res.body.data.items[0]).toHaveProperty('queuePosition');
   });
 
   it('GET /api/v1/dashboard/reader returns reader loan and reservation overview', async () => {
-    const res = await request(app).get('/api/v1/dashboard/reader');
+    const res = await request(app)
+      .get('/api/v1/dashboard/reader')
+      .set('Authorization', `Bearer ${readerToken}`);
     expect(res.status).toBe(200);
     expect(res.body.data).toHaveProperty('activeLoans');
     expect(res.body.data).toHaveProperty('activeReservations');

@@ -3,9 +3,23 @@ import { dashboardService } from './dashboard.service.js';
 export const dashboardController = {
   async getReader(req, res, next) {
     try {
-      const readerId = req.query.readerId || req.user?.id;
-      const result = await dashboardService.getReaderDashboard(readerId);
-      res.status(200).json({ data: result });
+      const result = await dashboardService.getReaderDashboard(req.user?.id);
+      res.status(200).json({
+        ...result,
+        data: result,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getOverdue(req, res, next) {
+    try {
+      const result = await dashboardService.getLibrarianOverdue();
+      res.status(200).json({
+        ...result,
+        data: result,
+      });
     } catch (err) {
       next(err);
     }
@@ -14,7 +28,10 @@ export const dashboardController = {
   async getLibrarian(req, res, next) {
     try {
       const result = await dashboardService.getLibrarianDashboard();
-      res.status(200).json({ data: result });
+      res.status(200).json({
+        ...result,
+        data: result,
+      });
     } catch (err) {
       next(err);
     }
