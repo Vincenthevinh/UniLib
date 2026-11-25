@@ -191,6 +191,25 @@ async function mockRequest(method, path, body) {
   }
   if (area === 'circulation') {
     requireRole('Librarian');
+    // N3 mock-only preview contract; Vinh must confirm the real F05 endpoint.
+    if (id === 'eligibility' && method === 'GET') {
+      const reader = state.users.find((u) => u.id === options.get('readerId') && u.role === 'Reader');
+      if (!reader) error(404, 'READER_NOT_FOUND', 'Enter a valid Reader UUID');
+      const barcode = (options.get('barcode') || '').trim();
+      const copy = state.copies.find((c) => c.barcode === barcode);
+      if (!copy) error(404, 'COPY_NOT_FOUND', 'Enter an existing Book Copy barcode');
+      const activeLoans = state.loans.filter((l) => l.readerId === reader.id && !l.returnedAt);
+      const overdueCount = activeLoans.filter((l) => isOverdue(l)).length;
+      const hold = state.reservations.find((r) => r.heldCopyId === copy.id && r.status === 'Ready');
+      let block = null;
+      if (!reader.isActive) block = { code: 'READER_INACTIVE', rule: 'BR-10', message: 'The Reader account is inactive.' };
+      else if (overdueCount) block = { code: 'READER_OVERDUE', rule: 'BR-04', message: 'Return overdue Loans before checkout.' };
+      else if (activeLoans.length >= 3) block = { code: 'LOAN_LIMIT', rule: 'BR-01', message: 'Reader already has 3 active Loans.' };
+      else if (copy.status === 'Reserved' && (!hold || hold.readerId !== reader.id || new Date(hold.expiresAt) <= new Date())) block = { code: 'HOLD_NOT_ELIGIBLE', rule: 'BR-08', message: 'This copy is reserved for another Reader or its hold expired.' };
+      else if (!['Available', 'Reserved'].includes(copy.status)) block = { code: 'COPY_IN_USE', rule: 'F05', message: 'Copy is not available for checkout.' };
+      return { reader: { id: reader.id, fullName: reader.fullName, isActive: reader.isActive }, copy: { id: copy.id, barcode: copy.barcode, status: copy.status, titleId: copy.titleId }, activeLoans: activeLoans.length, overdueCount, eligible: !block, block, heldForReaderId: hold?.readerId || null };
+    }
+
     if (id === 'checkout' && method === 'POST') {
       const reader = state.users.find((u) => u.id === body?.readerId && u.role === 'Reader' && u.isActive) ?? error(422, 'READER_INACTIVE', 'Reader not eligible');
       if (readerHasOverdue(reader.id)) error(422, 'READER_OVERDUE', 'Reader has overdue loans');
@@ -215,7 +234,7 @@ async function mockRequest(method, path, body) {
         if (next) { copy.status = 'Reserved'; next.status = 'Ready'; next.heldCopyId = copy.id; next.readyAt = nowIso(); next.expiresAt = new Date(Date.now() + 72 * 3600000).toISOString(); }
         else copy.status = 'Available';
       }
-      return { loan: clone(loan), copy: clone(copy) };
+      return { loan: clone(loan), copy: clone(copy), hold: clone(state.reservations.find((r) => r.heldCopyId === copy.id && r.status === 'Ready') || null) };
     }
     if (id === 'renew' && method === 'POST') {
       const loan = state.loans.find((l) => l.id === body?.loanId) ?? error(404, 'NOT_FOUND', 'Loan not found');
@@ -234,7 +253,7 @@ async function mockRequest(method, path, body) {
     }
     if (id === 'overdue') {
       if (role.role !== 'Librarian') error(403, 'FORBIDDEN', 'Librarian dashboard only');
-      return { items: clone(state.loans.filter((loan) => isOverdue(loan))) };
+      return { items: clone(state.loans.filter((loan) => isOverdue(loan)).map((loan) => { const reader = state.users.find((u) => u.id === loan.readerId); const copy = state.copies.find((c) => c.id === loan.copyId); const title = state.titles.find((t) => t.id === copy?.titleId); return { ...loan, reader: reader ? { id: reader.id, fullName: reader.fullName, email: reader.email, username: reader.username } : null, copy: copy ? { id: copy.id, barcode: copy.barcode, titleId: copy.titleId } : null, title: title ? { id: title.id, title: title.title } : null }; })) };
     }
   }
   error(404, 'MOCK_ROUTE_NOT_FOUND', `Mock route is not implemented: ${method} ${url.pathname}`);
