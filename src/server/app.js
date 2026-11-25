@@ -71,6 +71,8 @@ app.get('/api/health', async (req, res, next) => {
 });
 
 // Primary feature API routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', usersRoutes);
 app.use('/api/books', booksRouter);
 app.use('/api/copies', copiesRouter);
 app.use('/api/reservations', reservationsRouter);

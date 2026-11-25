@@ -4,7 +4,11 @@ export const authController = {
   async login(req, res, next) {
     try {
       const result = await authService.login(req.body);
-      res.status(200).json({ data: result });
+      res.status(200).json({
+        token: result.token,
+        user: result.user,
+        data: result,
+      });
     } catch (err) {
       next(err);
     }
@@ -13,7 +17,11 @@ export const authController = {
   async logout(req, res, next) {
     try {
       const result = await authService.logout(req.user?.id);
-      res.status(200).json({ data: result });
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: result,
+      });
     } catch (err) {
       next(err);
     }
@@ -22,7 +30,11 @@ export const authController = {
   async getMe(req, res, next) {
     try {
       const result = await authService.getMe(req.user?.id);
-      res.status(200).json({ data: result });
+      res.status(200).json({
+        user: result,
+        data: result,
+        ...result,
+      });
     } catch (err) {
       next(err);
     }
