@@ -40,6 +40,19 @@ Reservation = {id,readerId,titleId,heldCopyId,status,createdAt,readyAt,expiresAt
 Common 422 codes: COPY_AVAILABLE, NO_CIRCULATING_COPY, READER_OVERDUE, TITLE_ALREADY_BORROWED, RESERVATION_DUPLICATE, RESERVATION_LIMIT, READER_INACTIVE.
 409 codes: TITLE_IN_USE, COPY_IN_USE, COPY_HAS_HISTORY, RESERVATION_NOT_ACTIVE, HOLD_NOT_ELIGIBLE, CONCURRENT_MODIFICATION.
 
+## F05 Circulation (Loans — Vinh V3-W1)
+
+| Method / path | Role | Request | Response |
+|---|---|---|---|
+| POST /loans/checkout | Librarian | {readerId, barcode} | 201 {id, loanId, readerId, copyId, checkedOutAt, dueAt, dueDate, copy, fulfilledReservation, data} |
+| POST /loans/return | Librarian | {barcode, conditionNotes?, condition?} | 200 {id, loanId, copyId, barcode, returnedAt, loanStatus, copyStatus, copy, hold, data} |
+| POST /loans/:id/renew | Reader (owner) / Librarian | none (loan UUID in :id) | 200 {id, loanId, dueAt, newDueDate, renewedAt, renewalsCount, status, data} |
+| GET /loans/overdue | Librarian | none | 200 {items, total, data} |
+
+F05 error codes:
+- `422 READER_INACTIVE`, `422 READER_OVERDUE` (BR-04), `422 LOAN_LIMIT_EXCEEDED` (BR-01), `422 RENEWAL_LIMIT_EXCEEDED` (BR-03), `422 OVERDUE_RENEWAL_DENIED` (BR-03), `422 PENDING_RESERVATION_EXISTS` (BR-03).
+- `409 COPY_NOT_AVAILABLE`, `409 COPY_NOT_BORROWED`, `409 LOAN_ALREADY_RETURNED`, `409 HOLD_NOT_FOUND`, `409 HOLD_NOT_ELIGIBLE`.
+
 ## F05 integration exports for Vinh
 
 Import allocateNextHold(tx,titleId,copyId,now) from services/reservations.js when return is committed. Must be invoked inside same PostgreSQL transaction after title and copy locks; changes copy to Reserved with Ready hold or to Available.

@@ -1,0 +1,75 @@
+@startuml
+' UniLib PA3 V3-W1 | UC-07 Borrow Book (Circulation Checkout)
+title UC-07: Borrow Book (Circulation Checkout) - Sequence Diagram
+autonumber
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+
+actor Librarian
+boundary "SCR-07 Borrow UI" as UI
+control LoansController
+control AuthService
+control LoanService
+control ReservationService
+database "Prisma / PostgreSQL" as DB
+
+Librarian -> UI : Enter readerId & barcode, confirm checkout
+UI -> LoansController : POST /api/loans/checkout {readerId, barcode}\n-> checkout(req, res, next)
+activate LoansController
+
+LoansController -> AuthService : verifyJwt(token)
+activate AuthService
+AuthService -> DB : Find active User by sub
+DB --> AuthService : User | null
+AuthService -> AuthService : requireRole("Librarian")
+alt Invalid/missing JWT or role != Librarian
+  AuthService -->> LoansController : 401 UNAUTHENTICATED / 403 FORBIDDEN
+  LoansController -->> UI : 401 / 403 {error:{code,message}}
+  UI -->> Librarian : Show authorization error
+else Authorized Librarian
+  AuthService -->> LoansController : req.user (Librarian)
+  deactivate AuthService
+
+  LoansController -> LoanService : checkout(readerId, barcode)
+  activate LoanService
+
+  LoanService -> DB : prisma.$transaction + SELECT ... FOR UPDATE\n(users, book_titles, book_copies)
+  LoanService -> DB : Query Reader, activeLoansCount, overdueLoansCount, BookCopy
+
+  alt Reader không đủ điều kiện (Inactive / >= 3 active loans BR-01 / Overdue BR-04)
+    LoanService -> DB : ROLLBACK
+    LoanService -->> LoansController : 422 (READER_INACTIVE / LOAN_LIMIT_EXCEEDED / READER_OVERDUE)
+    LoansController -->> UI : 422 {error:{code,message}}
+    UI -->> Librarian : Display BR-01 / BR-04 rejection banner (no DB mutation)
+  else Reader đủ điều kiện
+    opt BookCopy.status == Reserved (FR-F06-06)
+      LoanService -> ReservationService : fulfillHeldReservation(tx, readerId, copyId, now)
+      activate ReservationService
+      ReservationService -> DB : Lock title, verify Ready hold (readerId & expiresAt > now)
+      alt Hold không hợp lệ hoặc đã hết hạn
+        ReservationService -->> LoanService : 409 HOLD_NOT_FOUND / HOLD_NOT_ELIGIBLE
+        LoanService -> DB : ROLLBACK
+        LoanService -->> LoansController : 409 {error:{code,message}}
+        LoansController -->> UI : 409 Hold mismatch / expired error
+      else Hold hợp lệ cho đúng Reader
+        ReservationService -> DB : UPDATE Reservation SET status = Fulfilled, fulfilledAt = now
+        ReservationService -->> LoanService : fulfilledReservation
+      end
+      deactivate ReservationService
+    end
+
+    alt BookCopy không Available (Borrowed / Damaged / Lost)
+      LoanService -> DB : ROLLBACK
+      LoanService -->> LoansController : 409 COPY_NOT_AVAILABLE
+      LoansController -->> UI : 409 Copy unavailable error
+    else BookCopy sẵn sàng (Available hoặc Reserved vừa fulfill)
+      LoanService -> DB : INSERT Loan (dueAt = now + 14 days)\nUPDATE BookCopy SET status = Borrowed\nCOMMIT
+      LoanService -->> LoansController : Loan + Copy + fulfilledReservation
+      deactivate LoanService
+      LoansController -->> UI : 201 Created {id, dueAt, copy, fulfilledReservation}
+      deactivate LoansController
+      UI -->> Librarian : Display checkout receipt (dueAt +14 days)
+    end
+  end
+end
+@enduml
