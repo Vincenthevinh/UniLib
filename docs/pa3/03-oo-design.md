@@ -75,11 +75,19 @@ classDiagram
       +Date checkedOutAt
       +Date dueAt
       +Date returnedAt
+      +Date renewedAt
     }
-    class CirculationService {
-      +checkout(readerId, copyId)
-      +checkin(copyId)
-      +renew(loanId)
+    class LoansController {
+      +checkout(req, res, next)
+      +returnBook(req, res, next)
+      +renew(req, res, next)
+      +listOverdue(req, res, next)
+    }
+    class LoanService {
+      +checkout(readerId, barcode)
+      +returnBook(barcode, conditionNotes)
+      +renewLoan(loanId, actor)
+      +listOverdue()
     }
   }
   namespace reservation {
@@ -92,8 +100,8 @@ classDiagram
     }
     class ReservationService {
       +placeReservation(readerId, titleId)
-      +allocateNextHold(titleId, copyId)
-      +fulfillHeldReservation(readerId, copyId)
+      +allocateNextHold(tx, titleId, copyId, now)
+      +fulfillHeldReservation(tx, readerId, copyId, now)
     }
   }
   User "1" --> "0..*" Loan : borrows
@@ -104,8 +112,12 @@ classDiagram
   BookCopy "0..1" --> "0..*" Reservation : allocated
   CatalogService ..> BookTitle
   CatalogService ..> BookCopy
-  CirculationService ..> Loan
-  CirculationService ..> ReservationService
+  LoansController ..> AuthService
+  LoansController ..> LoanService
+  LoanService ..> Loan
+  LoanService ..> BookCopy
+  LoanService ..> User
+  LoanService ..> ReservationService
   ReservationService ..> Reservation
   AuthService ..> User
 ```
@@ -241,18 +253,23 @@ classDiagram
 | verifyJwt | token → claims | service | Proposed / verify: `sub` + `role` claims (confirmed contract) |
 | requireRole | user, role → authorization result | service | Proposed / verify; missing JWT 401, forbidden role 403 |
 
-### C7 — LoanService (circulation)
-**Responsibility:** Executes checkout, return, and renewal under BR-01 through BR-04, coordinating allocated holds atomically.
+### C7 — LoanService & LoansController (circulation)
+**Responsibility:** Executes checkout, return, and renewal under BR-01 through BR-04, coordinating allocated holds atomically via transaction injection (`tx`) without circular dependency with `ReservationService`.
 
 | Attribute | Type | Visibility | Constraint | Description |
 |---|---|---|---|---|
-| prisma | PrismaClient | private | Injected transaction access | Server-owned data persistence |
+| prisma | PrismaClient | private | Transaction + `SELECT ... FOR UPDATE` | Server-owned ACID data persistence |
 
 | Operation | Parameters / Return | Visibility | Description / verification |
-|---|---|---|---|---|
-| checkout | readerId, copyId → Loan | service | Proposed / verify with Vinh; eligibility + 14-day due date |
-| checkin | copyId, condition → return result | service | Proposed / verify with Vinh; coordinate allocation in same transaction |
-| renew | loanId → Loan | service | Proposed / verify with Vinh; at most one eligible renewal |
+|---|---|---|---|
+| LoansController.checkout | req, res, next → 201 JSON | public | Verified in `src/modules/loans/loans.controller.js`; HTTP POST `/api/loans/checkout` |
+| LoansController.returnBook | req, res, next → 200 JSON | public | Verified in `src/modules/loans/loans.controller.js`; HTTP POST `/api/loans/return` |
+| LoansController.renew | req, res, next → 200 JSON | public | Verified in `src/modules/loans/loans.controller.js`; HTTP POST `/api/loans/:id/renew` |
+| LoansController.listOverdue | req, res, next → 200 JSON | public | Verified in `src/modules/loans/loans.controller.js`; HTTP GET `/api/loans/overdue` |
+| LoanService.checkout | readerId, barcode → Loan | public | Verified in `src/modules/loans/loans.service.js`; locks User → BookTitle → BookCopy, enforces BR-01/02/04 and FR-F06-06 |
+| LoanService.returnBook | barcode, conditionNotes → ReturnResult | public | Verified in `src/modules/loans/loans.service.js`; closes loan and calls `ReservationService.allocateNextHold(tx, ...)` |
+| LoanService.renewLoan | loanId, actor → Loan | public | Verified in `src/modules/loans/loans.service.js`; enforces BR-03 (max 1 renewal, not overdue, no pending holds) |
+| LoanService.listOverdue | now → {items, total} | public | Verified in `src/modules/loans/loans.service.js`; FR-F05-07 / FR-F07-03 |
 
 ### C8 — ReservationService (reservation)
 **Responsibility:** Maintains FIFO reservations and ensures allocation/fulfillment in safe database transactions.
@@ -262,10 +279,10 @@ classDiagram
 | prisma | PrismaClient | private | Transaction-aware | PostgreSQL 16 / Prisma integration |
 
 | Operation | Parameters / Return | Visibility | Description / verification |
-|---|---|---|---|---|
-| placeReservation | readerId, titleId → reservation,queuePosition | service | Named in Quân's reservation sequence diagram; verify actual export |
-| allocateNextHold | tx, titleId, copyId, now → allocation | service | **Confirmed named integration export** in W1 API contract |
-| fulfillHeldReservation | tx, readerId, copyId, now → fulfillment | service | **Confirmed named integration export** in W1 API contract |
+|---|---|---|---|
+| placeReservation | readerId, titleId → reservation,queuePosition | public | Verified in `services/reservations.js` |
+| allocateNextHold | tx, titleId, copyId, now → allocation | public | **Confirmed named integration export** in `services/reservations.js` |
+| fulfillHeldReservation | tx, readerId, copyId, now → fulfillment | public | **Confirmed named integration export** in `services/reservations.js` |
 
 ### 4.3.9 Traceability and Review Notes
 
@@ -277,15 +294,50 @@ classDiagram
 
 **Design caveats:** F01 `api.users.*` is provisional in the N1 API adapter. The UI's Authors field maps to the Q1 schema's single `author` string (not a separate authors table). The physical scanner remains out of scope. Account password management, status transition enforcement and atomic circulation decisions remain on the backend. Exact backend method names in C1–C7 require review of source before final baseline.
 
-## 4.4 Sequence Diagram — UC-01 Login (N3-W1)
+## 4.4 Sequence Diagrams
+
+### 4.4.1 UC-01 Login (N3-W1)
 
 - Diagram source: `docs/design/uml/seq-uc01.mmd`.
 - Export: `docs/design/uml/seq-uc01.png`.
 - Participants: User, SCR-01 Login UI, AuthController, AuthService, Prisma/PostgreSQL.
 - Main flow: credentials -> authentication -> JWT -> role-specific landing.
 - Alternative flows: incorrect password and inactive account.
-- The URI `/api/auth/login`, exact inactive-account HTTP status/error code, backend `login()` method, and login response payload are **provisional pending Vinh**. The diagram must be compared with F01 implementation before PA3 sign-off.
-- F01 requirement: JWT claims `sub` and `role`; authorization is verified against the persisted User record per request. No password hash is returned to frontend.
+- F01 verified in V2-W1 (`POST /api/auth/login`, `GET /api/auth/me`): JWT claims `sub` and `role`; authorization is verified against the persisted User record per request. No password hash is returned to frontend.
+
+### 4.4.2 UC-07 Borrow Book (Checkout) — V3-W1
+
+- Diagram source: [seq-uc07.puml](../design/uml/seq-uc07.puml)
+- Exported image: [seq-uc07.png](../design/uml/seq-uc07.png)
+
+![UC-07 Borrow Sequence Diagram](../design/uml/seq-uc07.png)
+
+- **Main flow:** Authenticated Librarian submits `{readerId, barcode}` → `LoansController.checkout()` verifies JWT & `Librarian` role via `AuthService` → `LoanService.checkout()` opens a PostgreSQL transaction and locks rows in canonical order (`User` → `BookTitle` → `BookCopy` via `SELECT ... FOR UPDATE`), verifies active Reader, `< 3` active loans (BR-01), `0` overdue loans (BR-04), sets `dueAt = now + 14 days` (BR-02), inserts `Loan`, updates `BookCopy.status = Borrowed`, and commits.
+- **Alt 1 — Reader không đủ điều kiện (BR-01 / BR-04 / Inactive):** Transaction rolls back with HTTP `422` (`READER_INACTIVE`, `LOAN_LIMIT_EXCEEDED`, or `READER_OVERDUE`); no loan or copy change is persisted.
+- **Alt 2 / Opt — Copy đang `Reserved` (FR-F06-06):** `LoanService` passes `tx` to `ReservationService.fulfillHeldReservation(tx, readerId, copyId, now)` inside the same transaction. Matching active hold transitions to `Fulfilled`; wrong reader or expired hold rolls back with HTTP `409`.
+
+### 4.4.3 UC-08 Return Book (Check-in) — V3-W1
+
+- Diagram source: [seq-uc08.puml](../design/uml/seq-uc08.puml)
+- Exported image: [seq-uc08.png](../design/uml/seq-uc08.png)
+
+![UC-08 Return Sequence Diagram](../design/uml/seq-uc08.png)
+
+- **Main flow (no waiting queue):** Authenticated Librarian submits `{barcode, conditionNotes}` → `LoansController.returnBook()` verifies JWT & `Librarian` role → `LoanService.returnBook()` locks `BookTitle` → `BookCopy` → `Loan` via `SELECT ... FOR UPDATE`, sets `Loan.returnedAt = now`, calls `ReservationService.allocateNextHold(tx, titleId, copyId, now)`, restores `BookCopy.status = Available`, and commits.
+- **Alt — Có hàng chờ Pending (BR-07, BR-08):** `allocateNextHold` selects the earliest `Pending` reservation (`ORDER BY createdAt ASC, id ASC`), updates it to `Ready` with `heldCopyId = copyId` and `expiresAt = now + 72 hours`, and transitions `BookCopy.status = Reserved` atomically.
+
+### 4.4.4 Sequence-to-Class Operation Traceability (UC-07 & UC-08)
+
+| Sequence Diagram | Caller → Callee | Message | Class Diagram Operation |
+|---|---|---|---|
+| UC-07 | UI → `LoansController` | `checkout(req, res, next)` | `LoansController.checkout(req, res, next)` |
+| UC-07, UC-08 | `LoansController` → `AuthService` | `verifyJwt(token)` | `AuthService.verifyJwt(token)` |
+| UC-07, UC-08 | `AuthService` → `AuthService` | `requireRole("Librarian")` | `AuthService.requireRole(role)` |
+| UC-07 | `LoansController` → `LoanService` | `checkout(readerId, barcode)` | `LoanService.checkout(readerId, barcode)` |
+| UC-07 | `LoanService` → `ReservationService` | `fulfillHeldReservation(tx, readerId, copyId, now)` | `ReservationService.fulfillHeldReservation(tx, readerId, copyId, now)` |
+| UC-08 | UI → `LoansController` | `returnBook(req, res, next)` | `LoansController.returnBook(req, res, next)` |
+| UC-08 | `LoansController` → `LoanService` | `returnBook(barcode, conditionNotes)` | `LoanService.returnBook(barcode, conditionNotes)` |
+| UC-08 | `LoanService` → `ReservationService` | `allocateNextHold(tx, titleId, copyId, now)` | `ReservationService.allocateNextHold(tx, titleId, copyId, now)` |
 
 ## 4.6 Design Principles and Patterns (N3-W1)
 

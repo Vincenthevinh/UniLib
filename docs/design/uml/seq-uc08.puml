@@ -1,0 +1,72 @@
+@startuml
+' UniLib PA3 V3-W1 | UC-08 Return Book (Circulation Check-in)
+title UC-08: Return Book (Circulation Check-in) - Sequence Diagram
+autonumber
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+
+actor Librarian
+boundary "SCR-08 Return UI" as UI
+control LoansController
+control AuthService
+control LoanService
+control ReservationService
+database "Prisma / PostgreSQL" as DB
+
+Librarian -> UI : Enter barcode & conditionNotes, confirm return
+UI -> LoansController : POST /api/loans/return {barcode, conditionNotes}\n-> returnBook(req, res, next)
+activate LoansController
+
+LoansController -> AuthService : verifyJwt(token)
+activate AuthService
+AuthService -> DB : Find active User by sub
+DB --> AuthService : User | null
+AuthService -> AuthService : requireRole("Librarian")
+alt Invalid/missing JWT or role != Librarian
+  AuthService -->> LoansController : 401 UNAUTHENTICATED / 403 FORBIDDEN
+  LoansController -->> UI : 401 / 403 {error:{code,message}}
+  UI -->> Librarian : Show authorization error
+else Authorized Librarian
+  AuthService -->> LoansController : req.user (Librarian)
+  deactivate AuthService
+
+  LoansController -> LoanService : returnBook(barcode, conditionNotes)
+  activate LoanService
+
+  LoanService -> DB : prisma.$transaction + SELECT ... FOR UPDATE\n(book_titles, book_copies, loans)
+  LoanService -> DB : Query BookCopy & active Loan (returnedAt IS NULL)
+
+  alt Copy không ở trạng thái Borrowed hoặc không có active Loan
+    LoanService -> DB : ROLLBACK
+    LoanService -->> LoansController : 409 COPY_NOT_BORROWED
+    LoansController -->> UI : 409 Duplicate / invalid return error
+  else Copy đang Borrowed với active Loan hợp lệ
+    LoanService -> DB : UPDATE Loan SET returnedAt = now
+    LoanService -> ReservationService : allocateNextHold(tx, titleId, copyId, now)
+    activate ReservationService
+    ReservationService -> DB : SELECT first Pending Reservation\nORDER BY createdAt ASC, id ASC
+
+    alt Có hàng chờ Pending (BR-07, BR-08)
+      ReservationService -> DB : UPDATE Reservation SET status = Ready,\nheldCopyId = copyId, readyAt = now,\nexpiresAt = now + 72 hours
+      ReservationService -> DB : UPDATE BookCopy SET status = Reserved
+      ReservationService -->> LoanService : hold {status: Ready, expiresAt: +72h}
+    else Không có hàng chờ Pending
+      ReservationService -> DB : UPDATE BookCopy SET status = Available
+      ReservationService -->> LoanService : null
+    end
+    deactivate ReservationService
+
+    LoanService -> DB : COMMIT
+    LoanService -->> LoansController : {loanStatus: RETURNED, copy, hold}
+    deactivate LoanService
+    LoansController -->> UI : 200 OK {loanStatus, copyStatus, copy, hold}
+    deactivate LoansController
+
+    alt hold != null (Reserved 72h)
+      UI -->> Librarian : Display Hold Shelf routing (Reader + 72h expiresAt)
+    else hold == null (Available)
+      UI -->> Librarian : Display return confirmation (Status: Available)
+    end
+  end
+end
+@enduml

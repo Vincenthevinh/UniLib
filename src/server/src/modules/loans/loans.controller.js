@@ -4,7 +4,10 @@ export const loansController = {
   async checkout(req, res, next) {
     try {
       const result = await loansService.checkout(req.body);
-      res.status(201).json({ data: result });
+      res.status(201).json({
+        ...result,
+        data: result,
+      });
     } catch (err) {
       next(err);
     }
@@ -13,7 +16,10 @@ export const loansController = {
   async returnBook(req, res, next) {
     try {
       const result = await loansService.returnBook(req.body);
-      res.status(200).json({ data: result });
+      res.status(200).json({
+        ...result,
+        data: result,
+      });
     } catch (err) {
       next(err);
     }
@@ -21,8 +27,12 @@ export const loansController = {
 
   async renew(req, res, next) {
     try {
-      const result = await loansService.renewLoan(req.params.id);
-      res.status(200).json({ data: result });
+      const actor = req.user ? { id: req.user.id, role: req.user.role } : null;
+      const result = await loansService.renewLoan(req.params.id, actor);
+      res.status(200).json({
+        ...result,
+        data: result,
+      });
     } catch (err) {
       next(err);
     }
@@ -31,7 +41,10 @@ export const loansController = {
   async listOverdue(req, res, next) {
     try {
       const result = await loansService.listOverdue();
-      res.status(200).json({ data: result });
+      res.status(200).json({
+        ...result,
+        data: result,
+      });
     } catch (err) {
       next(err);
     }
