@@ -1,12 +1,13 @@
 import { Router } from 'express';
+import { authenticate, authorize } from '../../middlewares/auth.js';
 import { booksController } from './books.controller.js';
 
 const router = Router();
 
 router.get('/', booksController.list);
-router.post('/', booksController.create);
+router.post('/', authenticate, authorize('Librarian'), booksController.create);
 router.get('/:id', booksController.getById);
-router.put('/:id', booksController.update);
-router.delete('/:id', booksController.delete);
+router.put('/:id', authenticate, authorize('Librarian'), booksController.update);
+router.delete('/:id', authenticate, authorize('Librarian'), booksController.delete);
 
 export default router;

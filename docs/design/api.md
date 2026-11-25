@@ -59,6 +59,18 @@ Import allocateNextHold(tx,titleId,copyId,now) from services/reservations.js whe
 Import fulfillHeldReservation(tx,readerId,copyId,now) for held checkout. It rejects when hold owner differs or pickup deadline passed; LoanService then changes copy to Borrowed and creates Loan in same transaction.
 Lock order must be consistent: BookTitle before BookCopy before Loan/Reservation mutation on hold paths; coordinate with existing F05 checkout/return logic to avoid deadlocks.
 
+## F07 Dashboard & Overdue Monitoring (Vinh V4-W1)
+
+| Method / path | Role | Request | Response |
+|---|---|---|---|
+| GET /me/dashboard | Reader | none (readerId derived strictly from JWT) | 200 {readerId, reader, loans, reservations, overdueCount, hasOverdue, overdueFlags, restrictions, alerts, generatedAt, data} |
+| GET /librarian/overdue | Librarian | none | 200 {items, total, generatedAt, data} |
+
+F07 payload details:
+- `GET /api/me/dashboard`: Each item in `loans` includes `{id, loanId, copyId, barcode, shelfLocation, titleId, bookTitle, author, isbn, checkedOutAt, checkoutDate, dueAt, dueDate, renewedAt, renewalsCount, isOverdue, overdue, lateDays, daysOverdue, daysRemaining, canRenew, renewBlockReason, copy}`. Each item in `reservations` includes `{id, reservationId, titleId, bookTitle, author, isbn, title, heldCopyId, heldCopy, status, createdAt, readyAt, expiresAt, pickupDeadline, queuePosition}`. `overdueFlags` = `{hasOverdue, overdueCount, maxLateDays, overdueLoanIds}`. `restrictions` = `{borrowingBlocked, reservingBlocked, canBorrow, canReserve, activeLoansCount, maxActiveLoans, activeReservationsCount, maxActiveReservations, reasons}`.
+- `GET /api/librarian/overdue`: Sorted by `dueAt ASC` (largest `lateDays` first). Each item includes `{id, loanId, readerId, copyId, checkedOutAt, dueAt, dueDate, renewedAt, lateDays, daysOverdue, readerName, readerEmail, readerUsername, barcode, bookTitle, reader: {id, username, fullName, email}, copy: {id, barcode, shelfLocation, status}, title: {id, isbn, title, author, category}}`.
+- Compatibility aliases: `GET /api/dashboard/reader` and `GET /api/v1/dashboard/reader` (Reader only) map to `getReader`; `GET /api/dashboard/overdue` and `GET /api/v1/dashboard/overdue` (Librarian only) map to `getOverdue`.
+
 ## Infrastructure and CORS
 
 GET /health queries PostgreSQL and returns 200 {status:"ok"} only when connected. CLIENT_ORIGIN controls the single allowed browser origin (default http://localhost:5173). The server accepts application/json request bodies up to 50 KiB.

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button, Input, Alert } from '../components';
-import api from '../services/endpoints';
+import api from '../api/endpoints';
 
 function getRoleHomeRoute(role) {
   if (role === 'Reader') return '/reader/catalog';
