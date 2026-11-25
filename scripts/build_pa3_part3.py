@@ -1,5 +1,5 @@
 """
-UniLib PA3 - Part 3: Object-Oriented Design
+UniLib PA3 - Part 3: Object-Oriented Design (Updated with accurate MMD sources)
 Team T05 (HCMUS FIT)
 """
 
@@ -81,7 +81,7 @@ def build_section_oo_design(doc):
     c3_attr_headers = ["Attribute", "Type", "Visibility", "Constraints", "Description"]
     c3_attr_rows = [
         ["id", "UUID", "private", "PK, default uuid()", "Unique copy identifier."],
-        ["barcode", "String", "private", "UNIQUE, NOT NULL", "Scannable physical barcode identifier."],
+        ["barcode", "String", "private", "UNIQUE, NOT NULL", "Physical barcode scanned at circulation desk."],
         ["titleId", "UUID", "private", "FK -> BookTitle.id", "Reference to parent catalog record (onDelete: Restrict)."],
         ["shelfLocation", "String", "private", "NOT NULL", "Physical shelf and bay location code."],
         ["status", "CopyStatus", "private", "Enum, default Available", "Lifecycle state: Available, Borrowed, Reserved, Damaged, Lost."],
@@ -206,42 +206,44 @@ def build_section_oo_design(doc):
     )
 
     add_heading_styled(doc, "4.5 State Machine Diagrams", level=2)
-    add_paragraph_styled(doc, "State Machine Diagrams formalize the permissible status lifecycles and trigger events for core circulation entities:")
+    add_paragraph_styled(doc, "State Machine Diagrams formalize the permissible status lifecycles and trigger events for core circulation entities based on the updated Mermaid state models:")
 
     # BookCopy State Machine
     add_heading_styled(doc, "4.5.1 BookCopy Lifecycle State Machine", level=3)
     add_paragraph_styled(doc, (
         "Models transitions between Available, Borrowed, Reserved, Damaged, and Lost. "
-        "A copy transitions to Borrowed upon checkout, to Reserved if an active hold exists upon check-in, or back to Available if no hold is queued."
+        "A copy transitions to Borrowed upon checkout, to Reserved if an active hold exists upon check-in (BR-08), or back to Available if no hold is queued. "
+        "Marking a copy Damaged or Lost transitions it to a non-circulating terminal state."
     ))
     add_figure_image(
         doc,
         "docs/design/uml/state-book-copy.png",
-        "Figure 4.6: State Machine Diagram for BookCopy Lifecycle — Source: docs/design/uml/state-book-copy.png"
+        "Figure 4.6: State Machine Diagram for BookCopy Lifecycle — Source: docs/design/uml/state-book-copy.mmd"
     )
 
     # Loan State Machine
     add_heading_styled(doc, "4.5.2 Loan Lifecycle State Machine", level=3)
     add_paragraph_styled(doc, (
-        "Models the transition from Active to Renewed or Returned. Note that 'Overdue' is a derived temporal state "
-        "(returnedAt IS NULL AND dueAt < now()) rather than a persisted enum value, ensuring zero synchronization drift."
+        "Models transitions from Active to Renewed (eligible under BR-03) or Returned. "
+        "Overdue is derived dynamically when now() > due_at and returned_at is null. "
+        "Returning an overdue copy transitions it to Returned and removes the patron's BR-04 borrowing suspension."
     ))
     add_figure_image(
         doc,
         "docs/design/uml/state-loan.png",
-        "Figure 4.7: State Machine Diagram for Loan Lifecycle — Source: docs/design/uml/state-loan.png"
+        "Figure 4.7: State Machine Diagram for Loan Lifecycle — Source: docs/design/uml/state-loan.mmd"
     )
 
     # Reservation State Machine
     add_heading_styled(doc, "4.5.3 Reservation Lifecycle State Machine", level=3)
     add_paragraph_styled(doc, (
-        "Models transitions from Pending to Ready (upon copy allocation), and subsequently to Fulfilled (upon checkout), "
-        "Expired (after 72 hours unclaimed), or Cancelled (by patron request)."
+        "Models transitions from Pending to Ready (upon copy allocation at check-in), and subsequently to Fulfilled (upon checkout within 72h), "
+        "Expired (after 72 hours unclaimed, reassigning to next patron), or Cancelled (by patron request)."
     ))
     add_figure_image(
         doc,
         "docs/design/uml/state-reservation.png",
-        "Figure 4.8: State Machine Diagram for Reservation Lifecycle — Source: docs/design/uml/state-reservation.png"
+        "Figure 4.8: State Machine Diagram for Reservation Lifecycle — Source: docs/design/uml/state-reservation.mmd"
     )
 
     add_heading_styled(doc, "4.6 Design Principles and Patterns", level=2)
@@ -282,4 +284,4 @@ def build_section_oo_design(doc):
     pat_widths = [Inches(1.5), Inches(2.2), Inches(2.8)]
     create_table_with_data(doc, pat_headers, pat_rows, col_widths=pat_widths, font_size=8.0)
 
-print("Part 3 definitions loaded.")
+print("Part 3 updated successfully.")
