@@ -1,0 +1,6 @@
+stateDiagram-v2
+  [*] --> Active : Checkout copy
+  Active --> Active : Renew (eligible)
+  Active --> Returned : Return copy before/at due_at
+  Active --> Overdue : Past due_at and returned_at is null
+  Overdue --> Returned : Return overdue copy

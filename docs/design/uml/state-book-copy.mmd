@@ -1,0 +1,11 @@
+stateDiagram-v2
+  [*] --> Available
+  Available --> Borrowed : Checkout
+  Available --> Reserved : Hold assigned for Ready reservation
+  Available --> Damaged : Mark damaged
+  Available --> Lost : Mark lost
+  Borrowed --> Available : Return (no Pending reservation)
+  Borrowed --> Reserved : Return (assign to oldest Pending reservation -> Ready)
+  Reserved --> Borrowed : Fulfill pickup within 72h
+  Reserved --> Available : Cancel or expire 72h (no next Pending reservation)
+  Reserved --> Reserved : Cancel or expire 72h (reassign next Pending -> Ready)
