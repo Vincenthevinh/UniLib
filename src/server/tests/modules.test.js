@@ -1,15 +1,56 @@
-import request from 'supertest';
-import app from '../app.js';
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
+import jwt from 'jsonwebtoken';
+import env from '../config/env.js';
+
+const mockPrisma = {
+  user: {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    count: jest.fn(),
+  },
+};
+jest.unstable_mockModule('../db.js', () => ({ prisma: mockPrisma }));
+
+const { app } = await import('../app.js');
+const request = (await import('supertest')).default;
+
+const adminId = '11111111-1111-4111-8111-111111111111';
+const adminToken = jwt.sign(
+  { sub: adminId, role: 'Administrator' },
+  process.env.JWT_SECRET || env.JWT_SECRET,
+  { algorithm: 'HS256' }
+);
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockPrisma.user.findUnique.mockResolvedValue({
+    id: adminId,
+    username: 'admin',
+    email: 'admin@unilib.edu.vn',
+    fullName: 'Demo Administrator',
+    role: 'Administrator',
+    isActive: true,
+  });
+  mockPrisma.user.count.mockResolvedValue(4);
+  mockPrisma.user.findMany.mockResolvedValue([
+    { id: adminId, username: 'admin', email: 'admin@unilib.edu.vn', fullName: 'Demo Administrator', role: 'Administrator', isActive: true },
+    { id: '22222222-2222-4222-8222-222222222222', username: 'librarian1', email: 'librarian1@unilib.edu.vn', fullName: 'Demo Librarian One', role: 'Librarian', isActive: true },
+  ]);
+});
 
 describe('UniLib API Modules Skeletons', () => {
   it('GET /api/v1/auth/me returns current user profile', async () => {
-    const res = await request(app).get('/api/v1/auth/me');
+    const res = await request(app)
+      .get('/api/v1/auth/me')
+      .set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
-    expect(res.body.data).toHaveProperty('role', 'ADMINISTRATOR');
+    expect(res.body.data).toHaveProperty('role', 'Administrator');
   });
 
   it('GET /api/v1/users returns paginated user list', async () => {
-    const res = await request(app).get('/api/v1/users');
+    const res = await request(app)
+      .get('/api/v1/users')
+      .set('Authorization', `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
     expect(res.body.data.items.length).toBeGreaterThan(0);
     expect(res.body.data.pagination).toBeDefined();
