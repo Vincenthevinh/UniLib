@@ -9,7 +9,7 @@ import {
   Alert,
   Button,
 } from '../../components';
-import api from '../../services/endpoints';
+import api from '../../api/endpoints';
 
 const PAGE_SIZE = 10;
 

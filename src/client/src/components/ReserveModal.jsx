@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button, Alert } from './index';
-import api from '../services/endpoints';
+import api from '../api/endpoints';
 
 export default function ReserveModal({
   isOpen,
