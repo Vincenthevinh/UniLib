@@ -21,6 +21,8 @@
     "db:dev": "prisma migrate dev",
     "db:seed": "node prisma/seed.js",
     "db:reset": "prisma migrate reset --force",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:seed": "node prisma/seed.js",
     "smoke": "node scripts/smoke.js",
     "design:check": "node scripts/check-data-design.js"
   },
