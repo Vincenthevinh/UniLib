@@ -1,0 +1,38 @@
+@startuml
+' UniLib PA3 N1-W1 | conceptual domain model, no operations
+left to right direction
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam linetype ortho
+class User <<concept>>
+class Reader <<role>>
+class Librarian <<role>>
+class Administrator <<role>>
+class BookTitle <<concept>>
+class BookCopy <<concept>>
+class Loan <<concept>>
+class Reservation <<concept>>
+Reader -up-|> User
+Librarian -up-|> User
+Administrator -up-|> User
+BookTitle "1" -- "0..*" BookCopy : has
+Reader "1" -- "0..*" Loan : borrows
+BookCopy "1" -- "0..*" Loan : records history
+Reader "1" -- "0..*" Reservation : places
+BookTitle "1" -- "0..*" Reservation : requests
+BookCopy "0..1" -- "0..*" Reservation : held copy (historical)
+note right of User
+  Logical specialization for roles only.
+  Persisted in one users table with role enum.
+  No Reader/Librarian/Admin tables in Q1 schema.
+end note
+note bottom of Loan
+  Overdue is derived from dueAt and returnedAt,
+  not a database status enum.
+end note
+note bottom of Reservation
+  heldCopyId nullable until allocation;
+  only one active hold per copy is enforced in DB.
+end note
+@enduml

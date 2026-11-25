@@ -1,0 +1,20 @@
+@startuml
+title UniLib PA3 — Return — UC-08
+autonumber
+skinparam shadowing false
+participant "Librarian" as p0
+participant "SCR-08" as p1
+participant "F05 API" as p2
+participant "PostgreSQL" as p3
+participant "Reservation module" as p4
+p0 -> p1 : Enter copy barcode + condition
+p1 -> p2 : Return request (route TBD)
+p2 -> p3 : Atomic return + copy status
+p2 -> p4 : allocateNextHold(tx,titleId,copyId,now)
+p4 -> p3 : Pending FIFO -> Ready; expiresAt +72h OR Available
+p2 -> p1 : Return result: hold info or Available
+p1 --> p2 : result
+note over p0,p4
+alt: damaged/lost copies excluded from allocation; exact route and response TBD.
+end note
+@enduml

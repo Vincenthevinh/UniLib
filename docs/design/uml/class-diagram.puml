@@ -1,0 +1,79 @@
+@startuml
+' N5 draft: confirmed persisted fields and separately documented module exports
+left to right direction
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+package "auth / Prisma model" {
+ class User <<Prisma model>> {
+  +id: UUID
+  +username: String
+  +email: String
+  +fullName: String
+  +role: Role
+  +isActive: Boolean
+ }
+}
+package "catalog / Prisma models" {
+ class BookTitle <<Prisma model>> {
+  +id: UUID
+  +isbn: String
+  +title: String
+  +author: String
+  +category: String
+  +publicationYear: Integer
+  +isActive: Boolean
+ }
+ class BookCopy <<Prisma model>> {
+  +id: UUID
+  +titleId: UUID
+  +barcode: String
+  +shelfLocation: String
+  +conditionNotes: String?
+  +status: CopyStatus
+ }
+}
+package "circulation / Prisma model" {
+ class Loan <<Prisma model>> {
+  +id: UUID
+  +readerId: UUID
+  +copyId: UUID
+  +checkedOutAt: DateTime
+  +dueAt: DateTime
+  +returnedAt: DateTime?
+  +renewedAt: DateTime?
+ }
+}
+package "reservation" {
+ class Reservation <<Prisma model>> {
+  +id: UUID
+  +readerId: UUID
+  +titleId: UUID
+  +heldCopyId: UUID?
+  +status: ReservationStatus
+  +createdAt: DateTime
+  +readyAt: DateTime?
+  +expiresAt: DateTime?
+ }
+ class "services/reservations.js" as ReservationModule <<module exports>> {
+  +allocateNextHold(tx, titleId, copyId, now)
+  +fulfillHeldReservation(tx, readerId, copyId, now)
+ }
+}
+User "1" -- "0..*" Loan : readerId
+User "1" -- "0..*" Reservation : readerId
+BookTitle "1" -- "0..*" BookCopy : titleId
+BookTitle "1" -- "0..*" Reservation : titleId
+BookCopy "1" -- "0..*" Loan : copyId
+BookCopy "0..1" -- "0..*" Reservation : heldCopyId (historical)
+ReservationModule ..> Reservation : changes through Prisma transaction
+ReservationModule ..> BookCopy : changes status through transaction
+note bottom of ReservationModule
+ Named exports taken from Quan's W1 API contract.
+ Exact implementation signatures must be checked in repo.
+ Do not infer a ReservationService class.
+end note
+note top of User
+ Reader / Librarian / Administrator are Role enum values,
+ not separate Prisma tables/classes.
+end note
+@enduml

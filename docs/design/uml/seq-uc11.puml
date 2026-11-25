@@ -1,0 +1,19 @@
+@startuml
+title UniLib PA3 — Fulfill held reservation — UC-11
+autonumber
+skinparam shadowing false
+participant "Librarian" as p0
+participant "Hold Shelf" as p1
+participant "F05 API" as p2
+participant "Reservation module" as p3
+participant "PostgreSQL" as p4
+p0 -> p1 : Select Ready reservation and copy
+p1 -> p2 : Held checkout request (route TBD)
+p2 -> p3 : fulfillHeldReservation(tx,readerId,copyId,now)
+p3 -> p4 : Verify owner/deadline, loan + copy state in same transaction
+p2 -> p1 : Success or HOLD_NOT_ELIGIBLE
+p1 --> p2 : result
+note over p0,p4
+alt: wrong owner, expired hold, concurrency conflict; authorization and response require backend test.
+end note
+@enduml

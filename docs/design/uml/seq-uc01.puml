@@ -1,0 +1,20 @@
+@startuml
+title UniLib PA3 — Login — UC-01
+autonumber
+skinparam shadowing false
+participant "User" as p0
+participant "Login UI" as p1
+participant "Auth HTTP API" as p2
+participant "Auth handler" as p3
+participant "Prisma/PostgreSQL" as p4
+p0 -> p1 : Enter username/password
+p1 -> p2 : Login request (route TBD)
+p2 -> p3 : Validate credentials / role (method TBD)
+p3 -> p4 : Fetch user and password hash
+p3 -> p2 : Success token OR failure
+p2 -> p1 : 200/401/inactive (status TBD)
+p1 --> p2 : result
+note over p0,p4
+alt: wrong password -> generic 401; inactive account -> response code/status TBD. Vinh must verify real route and handler.
+end note
+@enduml
