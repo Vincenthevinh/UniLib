@@ -1,0 +1,36 @@
+/* Shared, dependency-free PA3 N2 staff screens; suitable for integration into the existing layout. */
+.staff-page{font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:1200px;margin:auto;padding:28px 20px;color:#182637;line-height:1.5}
+.staff-page *{box-sizing:border-box}
+.staff-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}
+.staff-heading h1{font-size:clamp(1.6rem,3vw,2.25rem);margin:0}
+.staff-heading p{margin:4px 0 0;color:#526177}
+.staff-eyebrow{font-size:.8rem;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:#2b5f93!important}
+.staff-panel{border:1px solid #d5dfea;border-radius:14px;background:#fff;padding:22px;margin-bottom:18px;box-shadow:0 2px 12px rgba(27,48,71,.04)}
+.staff-panel h2{font-size:1.12rem;margin:0 0 16px}
+.staff-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;align-items:end}
+.staff-field{display:flex;flex-direction:column;gap:6px;font-size:.88rem;font-weight:600}
+.staff-field input,.staff-field select,.staff-search input,.staff-table input,.staff-table select{font:inherit;width:100%;border:1px solid #9aadc2;border-radius:8px;padding:9px 11px;min-height:40px;color:#182637;background:white}
+.staff-field [aria-invalid=true]{border-color:#b42318}
+.staff-error{color:#b42318;font-size:.8rem}
+.staff-checkbox{display:flex;gap:8px;align-items:center;min-height:40px}
+.staff-page button{font:inherit;cursor:pointer;border-radius:8px;padding:8px 13px;font-weight:650;min-height:38px}
+.staff-page button:disabled{cursor:not-allowed;opacity:.5}
+.staff-primary{background:#215b92;border:1px solid #215b92;color:white}
+.staff-secondary{background:white;border:1px solid #819ab2;color:#19486f}
+.staff-danger{background:#fff7f5;border:1px solid #bc4f43;color:#9a2c21}
+.staff-notice{border-left:4px solid #315d8f;padding:11px 14px;background:#eef5fc;margin-bottom:16px;white-space:pre-wrap}
+.staff-scroll{width:100%;overflow-x:auto}
+.staff-table{width:100%;border-collapse:collapse;text-align:left;min-width:650px;font-size:.88rem}
+.staff-table th,.staff-table td{border-bottom:1px solid #e0e7ee;padding:12px 10px;vertical-align:middle}
+.staff-table th{background:#f1f5f9;color:#304d67}
+.staff-table td div{color:#526177}
+.staff-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.staff-status{border-radius:99px;padding:4px 10px;background:#edf1f6;color:#4e5967;white-space:nowrap;font-weight:650;font-size:.78rem}
+.staff-status.is-ok{background:#e4f4ec;color:#1e6944}
+.staff-status.is-muted{background:#edf1f6;color:#506072}
+.staff-search{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:10px;align-items:end;margin-bottom:16px}
+.staff-search label{grid-column:1/-1;font-weight:600;font-size:.88rem}
+.staff-pager{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:12px}
+.staff-hint{font-size:.85rem;color:#526177}
+.staff-page :is(button,input,select):focus-visible{outline:3px solid #176abe;outline-offset:2px}
+@media(max-width:640px){.staff-heading{align-items:flex-start;flex-direction:column}.staff-page{padding:14px}.staff-panel{padding:15px}.staff-search{grid-template-columns:1fr}}

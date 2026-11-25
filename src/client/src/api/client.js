@@ -73,12 +73,24 @@ async function mockRequest(method, path, body) {
     requireRole('Administrator');
     if (!id && method === 'GET') return { items: clone(state.users) };
     if (!id && method === 'POST') {
-      const user = { ...body, id: uuid(), createdAt: nowIso(), updatedAt: nowIso() };
+      const mandatory = ['username', 'email', 'fullName', 'password', 'role'];
+      if (mandatory.some((key) => !String(body?.[key] ?? '').trim())) error(400, 'VALIDATION_ERROR', 'Complete all required fields, including a password');
+      if (!['Reader', 'Librarian', 'Administrator'].includes(body.role)) error(400, 'INVALID_ROLE', 'Select an approved role');
+      if (String(body.password).length < 8) error(400, 'INVALID_PASSWORD', 'Use a password of at least 8 characters');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) error(400, 'INVALID_EMAIL', 'Enter a valid email address');
+      if (state.users.some((u) => u.username.toLowerCase() === body.username.toLowerCase() || u.email.toLowerCase() === body.email.toLowerCase())) error(409, 'USER_EXISTS', 'Username or email already exists');
+      const { password: _password, ...safe } = body;
+      const user = { ...safe, id: uuid(), isActive: Boolean(body.isActive), createdAt: nowIso(), updatedAt: nowIso() };
       state.users.push(user); return clone(user);
     }
     const user = state.users.find((u) => u.id === id) ?? error(404, 'NOT_FOUND', 'User not found');
     if (method === 'GET') return clone(user);
-    if (method === 'PATCH') { Object.assign(user, body, { updatedAt: nowIso() }); return clone(user); }
+    if (method === 'PATCH') {
+      if (body?.role !== undefined && !['Reader', 'Librarian', 'Administrator'].includes(body.role)) error(400, 'INVALID_ROLE', 'Select an approved role');
+      if (body?.isActive !== undefined && typeof body.isActive !== 'boolean') error(400, 'INVALID_STATUS', 'Account status must be a boolean');
+      const patch = Object.fromEntries(Object.entries(body || {}).filter(([key]) => ['role', 'isActive', 'fullName'].includes(key)));
+      Object.assign(user, patch, { updatedAt: nowIso() }); return clone(user);
+    }
   }
   if (area === 'books') {
     if (!id && method === 'GET') {
@@ -94,7 +106,11 @@ async function mockRequest(method, path, body) {
     }
     if (!id && method === 'POST') {
       requireRole('Librarian');
-      if (state.titles.some((t) => t.isbn === body?.isbn)) error(409, 'DUPLICATE_ISBN', 'ISBN already exists');
+      for (const key of ['isbn', 'title', 'author', 'category']) {
+        if (!String(body?.[key] ?? '').trim()) error(400, 'VALIDATION_ERROR', `Enter a valid ${key}`);
+      }
+      if (!Number.isInteger(body.publicationYear) || body.publicationYear < 1450) error(400, 'INVALID_YEAR', 'Enter a valid publication year');
+      if (state.titles.some((t) => t.isbn === body.isbn)) error(409, 'DUPLICATE_ISBN', 'ISBN already exists');
       const title = { ...body, id: uuid(), isActive: true, createdAt: nowIso(), updatedAt: nowIso() };
       state.titles.push(title); return detail(title);
     }
@@ -103,6 +119,7 @@ async function mockRequest(method, path, body) {
       if (method === 'GET') return { items: clone(state.copies.filter((c) => c.titleId === id).map(({ id: copyId, barcode, status, shelfLocation, conditionNotes }) => ({ id: copyId, barcode, status, shelfLocation, conditionNotes }))) };
       if (method === 'POST') {
         requireRole('Librarian');
+        if (!String(body?.barcode ?? '').trim() || !String(body?.shelfLocation ?? '').trim()) error(400, 'VALIDATION_ERROR', 'Enter barcode and shelf location');
         if (state.copies.some((c) => c.barcode === body?.barcode)) error(409, 'DUPLICATE_BARCODE', 'Barcode already in use');
         const copy = { ...body, id: uuid(), titleId: id, status: 'Available', createdAt: nowIso(), updatedAt: nowIso() };
         state.copies.push(copy); return clone(copy);
@@ -111,7 +128,14 @@ async function mockRequest(method, path, body) {
     const title = getTitle(id);
     if (method === 'GET') return detail(title);
     requireRole('Librarian');
-    if (method === 'PATCH') { Object.assign(title, body, { updatedAt: nowIso() }); return detail(title); }
+    if (method === 'PATCH') {
+      for (const key of ['isbn', 'title', 'author', 'category']) {
+        if (key in (body || {}) && !String(body[key] ?? '').trim()) error(400, 'VALIDATION_ERROR', `Enter a valid ${key}`);
+      }
+      if (body?.isbn && state.titles.some((t) => t.id !== title.id && t.isbn === body.isbn)) error(409, 'DUPLICATE_ISBN', 'ISBN already exists');
+      if (body?.publicationYear !== undefined && (!Number.isInteger(body.publicationYear) || body.publicationYear < 1450)) error(400, 'INVALID_YEAR', 'Enter a valid publication year');
+      Object.assign(title, body, { updatedAt: nowIso() }); return detail(title);
+    }
     if (method === 'DELETE') {
       if (state.copies.some((c) => c.titleId === id) || state.reservations.some((r) => r.titleId === id && active(r))) error(409, 'TITLE_IN_USE', 'Title cannot be deactivated while in use');
       title.isActive = false; title.updatedAt = nowIso(); return detail(title);
@@ -120,7 +144,13 @@ async function mockRequest(method, path, body) {
   if (area === 'copies' && id) {
     requireRole('Librarian');
     const copy = getCopy(id);
-    if (method === 'PATCH') { Object.assign(copy, body, { updatedAt: nowIso() }); return clone(copy); }
+    if (method === 'PATCH') {
+      if (body?.shelfLocation !== undefined && !String(body.shelfLocation).trim()) error(400, 'VALIDATION_ERROR', 'Shelf location cannot be empty');
+      if (body?.status !== undefined && !['Available', 'Borrowed', 'Reserved', 'Damaged', 'Lost'].includes(body.status)) error(400, 'INVALID_COPY_STATUS', 'Unknown Book Copy status');
+      // N2 only edits metadata; lifecycle transitions remain managed by circulation workflows.
+      const patch = Object.fromEntries(Object.entries(body || {}).filter(([key]) => ['shelfLocation', 'conditionNotes'].includes(key)));
+      Object.assign(copy, patch, { updatedAt: nowIso() }); return clone(copy);
+    }
     if (method === 'DELETE') {
       if (['Borrowed', 'Reserved'].includes(copy.status)) error(409, 'COPY_IN_USE', 'Copy is currently circulating');
       if (state.loans.some((l) => l.copyId === copy.id) || state.reservations.some((r) => r.heldCopyId === copy.id)) error(409, 'COPY_HAS_HISTORY', 'Copy has circulation history');
