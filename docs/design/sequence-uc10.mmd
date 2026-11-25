@@ -1,23 +1,26 @@
 sequenceDiagram
-  actor Reader
-  participant API as ReservationController
-  participant Auth as JWT/RBAC
+  autonumber
+  actor Reader as Reader / Patron
+  participant API as ReservationsController
+  participant Auth as JWT / RBAC Middleware
   participant Svc as ReservationService
-  participant DB as PostgreSQL
-  Reader->>API: POST /api/reservations {titleId}
-  API->>Auth: Verify JWT and Reader role
-  alt Invalid token / wrong role
-    Auth-->>Reader: 401 / 403
-  else Authorized
+  participant DB as PostgreSQL 16
+  Reader->>API: POST /api/reservations (titleId)
+  API->>Auth: Verify Bearer JWT and Reader role
+  alt Invalid token or unauthorized role
+    Auth-->>Reader: 401 Unauthorized / 403 Forbidden
+  else Authorized Reader
     API->>Svc: placeReservation(readerId, titleId)
-    Svc->>DB: BEGIN SERIALIZABLE; lock Reader and Title rows
-    Svc->>DB: Check active, zero Available, limit, overdue, duplicate title
-    alt Eligibility violation
-      DB-->>Svc: Disallowed
-      Svc-->>Reader: 422 {error:{code,message}} (ROLLBACK)
-    else Eligible
-      Svc->>DB: INSERT Pending reservation, FIFO by createdAt and id
-      Svc->>DB: COMMIT
-      Svc-->>Reader: 201 {reservation,queuePosition}
+    Svc->>DB: BEGIN TRANSACTION (SERIALIZABLE)
+    Svc->>DB: Lock Reader and Title rows (SELECT FOR UPDATE)
+    Svc->>DB: Check eligibility (BR-04, BR-05, BR-06, BR-07)
+    alt Eligibility violation (Active loans overdue / Copy available / Hold limit reached)
+      DB-->>Svc: Rule violation
+      Svc->>DB: ROLLBACK
+      Svc-->>Reader: 422 Unprocessable Entity (Business Error)
+    else Fully Eligible
+      Svc->>DB: INSERT INTO reservations (status='Pending', FIFO queue)
+      Svc->>DB: COMMIT TRANSACTION
+      Svc-->>Reader: 201 Created (reservation details & queuePosition)
     end
   end
