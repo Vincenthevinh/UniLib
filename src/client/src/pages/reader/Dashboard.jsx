@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Alert, Badge, Button, Table, EmptyState } from '../../components';
-import api from '../../services/endpoints';
+import api from '../../api/endpoints';
 
 function getDaysRemaining(loan) {
   if (typeof loan.daysRemaining === 'number') return loan.daysRemaining;

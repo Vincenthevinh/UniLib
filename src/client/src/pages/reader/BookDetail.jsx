@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Table, Badge, Button, Alert, EmptyState } from '../../components';
 import ReserveModal from '../../components/ReserveModal';
-import api from '../../services/endpoints';
+import api from '../../api/endpoints';
 
 function getCopyCounts(book) {
   const copies = Array.isArray(book?.copies) ? book.copies : [];
