@@ -125,32 +125,6 @@ npm run dev
 | http://localhost:5173 | UniLib React Client SPA is running (`SCR-01` Login) |
 | http://localhost:5555 | Prisma Studio (run `npx prisma studio` in `src/server`) |
 
----
-
-## Environment Variables
-
-### `src/server/.env`
-
-```env
-NODE_ENV=development
-PORT=3001
-CLIENT_ORIGIN=http://localhost:5173
-DATABASE_URL=postgresql://postgres:postgres@localhost:55432/unilib
-JWT_SECRET=unilib_super_secret_jwt_key_at_least_32_chars_long
-JWT_EXPIRES_IN=7d
-BCRYPT_SALT_ROUNDS=10
-RESERVATION_SWEEP_MS=60000
-```
-
-### `src/client/.env`
-
-```env
-VITE_API_BASE_URL=http://localhost:3001/api
-VITE_USE_MOCK=false
-```
-
----
-
 ## W1 Release Demo Features (F01–F07 Scope)
 
 - **F01 (Authentication & RBAC):** Credential sign-in, stateless JWT tokens, client logout, admin user management (`SCR-01`, `SCR-02`).
@@ -200,48 +174,6 @@ npm run build         # Build production bundle to dist/
 npm run test          # Run Vitest client tests
 npm run lint          # Run ESLint on frontend code
 ```
-
----
-
-## Project Structure
-
-```text
-UniLib/
-├── .github/                  CI/CD workflows, issue templates, PR template
-├── docs/
-│   ├── design/               Design assets, ADRs, C4, UML, ERD, screens
-│   │   ├── a11y/             Lighthouse audit & color contrast inspection evidence
-│   │   ├── adr/              4 Architecture Decision Records (ADR-001..004)
-│   │   ├── c4/               C4 Context (L1) and Container (L2) models
-│   │   ├── screens/          Screen captures for SCR-01 to SCR-12 (A5)
-│   │   └── uml/              Domain model, Sequence diagrams, State machines
-│   ├── pa3/                  PA3 detailed design work package markdown files
-│   └── management/           Meeting minutes, weekly reports, WBS tracking
-├── pa/
-│   ├── PA2/                  SRS Baseline v1.0.0 (T05-PA2.docx)
-│   └── PA3/                  PA3 Software Design Deliverables:
-│                             ├── PA3-SoftwareDesign.docx
-│                             └── PA3-SoftwareDesign.pdf
-├── src/
-│   ├── client/               Frontend Single Page Application (React 18 + Vite)
-│   │   ├── src/
-│   │   │   ├── api/          API client, endpoints, business error mapper
-│   │   │   ├── components/   Shared UI components, Modal, AppHeader
-│   │   │   ├── context/      AuthContext (JWT session management)
-│   │   │   ├── pages/        Role-based screen views (reader, librarian, admin)
-│   │   │   └── styles/       CSS layouts and responsive polish (NFR-07)
-│   ├── server/               Backend REST API (Node.js 22 LTS + Express.js)
-│   │   ├── prisma/           schema.prisma (5 models), migrations, seed.js
-│   │   ├── src/
-│   │   │   ├── middlewares/  authenticate, authorize, errorHandler, requestId
-│   │   │   └── modules/      auth, users, books, copies, loans, reservations, dashboard
-│   │   └── tests/            13 Jest test suites (237 tests)
-│   └── V5-W1.md              Gate W1 Handoff Report & Release v0.3 documentation
-├── docker-compose.yml        Docker orchestration for PostgreSQL 16 + Express API
-└── README.md                 Project documentation and setup guide
-```
-
----
 
 ## Test Accounts
 
