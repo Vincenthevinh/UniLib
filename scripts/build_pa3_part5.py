@@ -1,16 +1,16 @@
 """
-UniLib PA3 - Part 5: Traceability, Changes, AI Usage & Sign-off
-Team T05 (HCMUS FIT)
+UniLib PA3 - Section 8: Traceability Update, Section 9: Changes Since PA2, Section 10: AI Usage Log
+Strictly matching PA3-SoftwareDesign-template.docx format
 """
 
 from docx.shared import Inches, Pt, RGBColor
 from scripts.build_pa3_full import (
     add_heading_styled, add_paragraph_styled, add_bullet_point,
-    add_figure_image, create_table_with_data
+    create_table_with_data
 )
 
 def build_section_traceability(doc):
-    add_heading_styled(doc, "7. Traceability Update", level=1)
+    add_heading_styled(doc, "Traceability Update", level=1)
     add_paragraph_styled(doc, (
         "The Requirements Traceability Matrix (RTM) extends the frozen PA2 baseline (FR -> UC -> SCR -> AC) by mapping every requirement "
         "forward into concrete software design elements: Client Components, Server Classes / Services, and RESTful HTTP Endpoints. "
@@ -39,95 +39,87 @@ def build_section_traceability(doc):
         # F04
         ["FR-F04-01", "UC-05", "SCR-05", "Catalog.jsx", "CatalogService.searchTitles", "GET /api/v1/books"],
         ["FR-F04-02", "UC-05", "SCR-05", "CatalogFilter.jsx", "CatalogService.filterTitles", "GET /api/v1/books?category=..."],
-        ["FR-F04-03", "UC-05", "SCR-05", "CatalogList.jsx", "CatalogService.getAvailability", "GET /api/v1/books?available=true"],
-        ["FR-F04-04", "UC-05", "SCR-05", "Pagination.jsx", "CatalogService.paginateTitles", "GET /api/v1/books?page=1&limit=10"],
+        ["FR-F04-03", "UC-05", "SCR-05", "CatalogList.jsx", "CatalogService.getAvailableOnly", "GET /api/v1/books?availableOnly=true"],
+        ["FR-F04-04", "UC-05", "SCR-05", "CatalogSort.jsx", "CatalogService.sortTitles", "GET /api/v1/books?sortBy=..."],
+        ["FR-F04-05", "UC-05", "SCR-05", "Pagination.jsx", "CatalogService.paginateTitles", "GET /api/v1/books?page=1&limit=10"],
         # F05
-        ["FR-F05-01", "UC-07", "SCR-07", "CirculationBorrow.jsx", "LoanService.checkout", "POST /api/v1/loans/checkout"],
-        ["FR-F05-02", "UC-07", "SCR-07", "CirculationBorrow.jsx", "LoanService.validateBR01", "POST /api/v1/loans/checkout"],
-        ["FR-F05-03", "UC-07", "SCR-07", "CirculationBorrow.jsx", "LoanService.apply14Days", "POST /api/v1/loans/checkout"],
-        ["FR-F05-04", "UC-08", "SCR-08", "CirculationReturn.jsx", "LoanService.returnBook", "POST /api/v1/loans/return"],
-        ["FR-F05-05", "UC-08", "SCR-08", "CirculationReturn.jsx", "ReservationService.allocateNextHold", "POST /api/v1/loans/return"],
-        ["FR-F05-06", "UC-09", "SCR-11", "ReaderDashboard.jsx", "LoanService.renewLoan", "POST /api/v1/loans/:id/renew"],
-        ["FR-F05-07", "UC-12", "SCR-12", "LibrarianOverdue.jsx", "DashboardService.getOverdue", "GET /api/librarian/overdue"],
+        ["FR-F05-01", "UC-07", "SCR-07", "CirculationBorrow.jsx", "LoanService.checkout", "POST /api/v1/loans"],
+        ["FR-F05-02", "UC-07", "SCR-07", "CirculationBorrow.jsx", "LoanService.calculateDueAt", "POST /api/v1/loans (14 days)"],
+        ["FR-F05-03", "UC-07", "SCR-07", "CirculationBorrow.jsx", "LoanService.checkLoanLimit", "POST /api/v1/loans (BR-01)"],
+        ["FR-F05-04", "UC-07", "SCR-07", "CirculationBorrow.jsx", "LoanService.checkOverdueBlock", "POST /api/v1/loans (BR-04)"],
+        ["FR-F05-05", "UC-08", "SCR-08", "CirculationReturn.jsx", "LoanService.returnBook", "POST /api/v1/loans/:id/return"],
+        ["FR-F05-06", "UC-08", "SCR-08", "CirculationReturn.jsx", "LoanService.inspectCondition", "POST /api/v1/loans/:id/return"],
+        ["FR-F05-07", "UC-08", "SCR-08", "CirculationReturn.jsx", "ReservationService.allocateNextHold", "POST /api/v1/loans/:id/return (BR-08)"],
+        ["FR-F05-08", "UC-11", "SCR-11", "ReaderDashboard.jsx", "LoanService.renewLoan", "POST /api/v1/loans/:id/renew (BR-03)"],
         # F06
-        ["FR-F06-01", "UC-10", "SCR-06", "ReserveModal.jsx", "ReservationService.checkBR05", "POST /api/v1/reservations"],
-        ["FR-F06-02", "UC-10", "SCR-09", "ReserveModal.jsx", "ReservationService.placeReservation", "POST /api/v1/reservations"],
-        ["FR-F06-03", "UC-10", "SCR-11", "ReaderDashboard.jsx", "ReservationService.getQueuePos", "GET /api/me/dashboard"],
-        ["FR-F06-04", "UC-11", "SCR-10", "HoldShelf.jsx", "ReservationService.sweepExpired", "Internal Timer / API sweep"],
-        ["FR-F06-05", "UC-11", "SCR-10", "HoldShelf.jsx", "ReservationService.cancelHold", "DELETE /api/v1/reservations/:id"],
-        ["FR-F06-06", "UC-07", "SCR-07", "CirculationBorrow.jsx", "ReservationService.fulfillHold", "POST /api/v1/loans/checkout"],
+        ["FR-F06-01", "UC-10", "SCR-09", "ReserveModal.jsx", "ReservationService.placeReservation", "POST /api/v1/reservations"],
+        ["FR-F06-02", "UC-10", "SCR-09", "ReserveModal.jsx", "ReservationService.checkZeroAvailability", "POST /api/v1/reservations (BR-05)"],
+        ["FR-F06-03", "UC-10", "SCR-09", "ReserveModal.jsx", "ReservationService.getFIFOQueuePosition", "GET /api/v1/reservations/:id/position"],
+        ["FR-F06-04", "UC-11", "SCR-10", "HoldShelf.jsx", "ReservationService.manageHoldShelf", "GET /api/v1/holds"],
+        ["FR-F06-05", "UC-11", "SCR-11", "ReaderDashboard.jsx", "ReservationService.cancelReservation", "DELETE /api/v1/reservations/:id"],
         # F07
-        ["FR-F07-01", "UC-12", "SCR-11", "ReaderDashboard.jsx", "DashboardService.getReaderDashboard", "GET /api/me/dashboard"],
-        ["FR-F07-02", "UC-12", "SCR-11", "ReaderDashboard.jsx", "DashboardService.calcRenewStatus", "GET /api/me/dashboard"],
-        ["FR-F07-03", "UC-12", "SCR-12", "LibrarianOverdue.jsx", "DashboardService.getLibrarianOverdue", "GET /api/librarian/overdue"],
+        ["FR-F07-01", "UC-12", "SCR-11", "ReaderDashboard.jsx", "DashboardService.getReaderDashboard", "GET /api/v1/dashboard/reader"],
+        ["FR-F07-02", "UC-12", "SCR-12", "OverdueMonitoring.jsx", "DashboardService.getOverdueLoans", "GET /api/v1/dashboard/overdue"],
         # NFRs
-        ["NFR-01", "UC-05", "SCR-05", "CatalogList.jsx", "GIN & B-tree Indexes", "GET /api/v1/books"],
-        ["NFR-02", "UC-01..12", "All", "Vite Code Splitting", "Vercel Edge Global CDN", "Static Assets CDN"],
-        ["NFR-03", "UC-01", "SCR-01", "Login.jsx", "bcryptjs (10 rounds)", "POST /api/auth/login"],
-        ["NFR-04", "All", "All", "AuthContext.jsx", "authenticate / authorize", "41 Protected Endpoints"],
-        ["NFR-05", "UC-07, 08", "SCR-07, 08", "Borrow.jsx, Return.jsx", "SELECT FOR UPDATE / tx", "POST /checkout, /return"],
-        ["NFR-06", "All", "All", "Accessible CSS Styles", "Lighthouse WCAG 2.1 AA", "Client App Shell"],
-        ["NFR-07", "All", "All", "Responsive Breakpoints", "Cross-browser Emulation", "Client App Shell"],
-        ["NFR-08", "All", "All", "ErrorBoundary.jsx", "Centralized errorHandler", "All Express Routes"]
+        ["NFR-01", "UC-05", "SCR-05", "CatalogList.jsx", "CatalogService + GIN / B-Tree Indexes", "GET /api/v1/books"],
+        ["NFR-02", "All", "All", "Vite Code Splitting + CDN", "Vercel Global Edge CDN", "Static Assets (LCP <= 2.5s)"],
+        ["NFR-03", "UC-01", "SCR-01", "Login.jsx", "AuthService (bcrypt salt >= 10)", "POST /api/auth/login"],
+        ["NFR-04", "All", "All", "AppRouter.jsx", "authenticate / authorize Middleware", "All Protected Endpoints"],
+        ["NFR-05", "UC-07, 08", "SCR-07, 08", "Circulation Desk", "Prisma $transaction + Row Locks", "POST /api/v1/loans*"],
+        ["NFR-06", "All", "All", "Semantic HTML & CSS", "WCAG 2.1 AA Checklist & Palette", "All Views (Score >= 96)"],
+        ["NFR-07", "All", "All", "CSS Grid / Flexbox", "Cross-Browser Normalized Styles", "1024px to 1920px"],
+        ["NFR-08", "All", "All", "ErrorBoundary.jsx", "errorHandler Middleware & seed.js", "Global Error Envelope"]
     ]
-    rtm_widths = [Inches(0.9), Inches(0.8), Inches(0.8), Inches(1.3), Inches(1.4), Inches(1.3)]
-    create_table_with_data(doc, rtm_headers, rtm_rows, col_widths=rtm_widths, font_size=7.0)
+    rtm_widths = [Inches(0.9), Inches(0.7), Inches(0.7), Inches(1.3), Inches(1.6), Inches(1.6)]
+    create_table_with_data(doc, rtm_headers, rtm_rows, col_widths=rtm_widths, font_size=7.5)
 
 def build_section_changes(doc):
-    add_heading_styled(doc, "8. Changes to the Requirements Since PA2", level=1)
+    add_heading_styled(doc, "Changes to the Requirements Since PA2", level=1)
     add_paragraph_styled(doc, (
         "In strict compliance with software configuration management rules, no frozen functional requirements, "
-        "business rules, or use case identifiers from PA2 have been modified or renumbered. The table below documents "
-        "design clarifications and implementation mappings established during PA3 to guide development:"
+        "business rules, or use case boundaries from the approved PA2 Baseline (v1.0.0) were altered. "
+        "Four technical clarifications emerged during the architectural realization phase and were formally approved by the PM:"
     ))
 
-    chg_headers = ["#", "Proposed Clarification / Design Decision", "Reason & Evidence", "Affected Items", "Classification", "PM Approval Status"]
+    chg_headers = ["#", "Change", "Reason", "Affected items"]
     chg_rows = [
         [
-            "CHG-01",
-            "Derive loan overdue status dynamically at query time (returnedAt IS NULL AND dueAt < now()) rather than storing an enum.",
-            "Eliminates data synchronization anomalies and background cron lag. Overdue is purely temporal.",
-            "F05, F07; BR-04; UC-07, 12; SCR-12",
-            "Design Clarification (Zero SRS impact)",
-            "Approved by PM (Vinh)"
+            "1",
+            "Added explicit GET /api/health endpoint returning database connection status and server timestamp.",
+            "Enables automated container health probes on cloud hosting (Render) and pre-demo warm-up verification.",
+            "NFR-08; Deployment Diagram; src/server/src/app.js"
         ],
         [
-            "CHG-02",
-            "Standardize reservation statuses as Pending, Ready, Fulfilled, Cancelled, Expired; Ready holds expire exactly 72h after copy allocation.",
-            "Database enum representation of PA2 'Ready for Pickup' status and BR-08 72-hour hold staging rule.",
-            "F06; BR-07, 08; UC-10, 11; SCR-10",
-            "Design Clarification of Hold Policy",
-            "Approved by PM (Vinh)"
+            "2",
+            "Refined reservation queue cancellation behavior: If a patron cancels a reservation in Ready state, the allocated copy is immediately reassigned to the next FIFO patron.",
+            "Eliminates wasted hold shelf capacity and guarantees fair book circulation under BR-07 and BR-08.",
+            "F06; BR-07, BR-08; UC-10, UC-11; ReservationService"
         ],
         [
-            "CHG-03",
-            "Map physical copy statuses to Available, Borrowed, Reserved, Damaged, Lost; record inspection details in conditionNotes text.",
+            "3",
+            "Formalized CopyStatus enum values as Available, Borrowed, Reserved, Damaged, Lost; physical damage details stored in conditionNotes text.",
             "Provides clean relational enum while preserving descriptive qualitative feedback from Librarian check-in.",
-            "F03, F05; UC-04, 08; SCR-04, 08",
-            "Design Mapping Clarification",
-            "Approved by PM (Vinh)"
+            "F03, F05; UC-04, 08; SCR-04, 08; book_copies table"
         ],
         [
-            "CHG-04",
+            "4",
             "Deploy functional Hold Shelf view (SCR-10) displaying Ready holds and Pending FIFO queues without manual reordering.",
             "Fulfills UC-11 requirements and ensures complete UI coverage across all 12 frozen screens in PA2 inventory.",
-            "SCR-10, UC-11, F06",
-            "UI Design Clarification",
-            "Approved by PM (Vinh)"
+            "SCR-10, UC-11, F06; HoldShelf.jsx"
         ]
     ]
-    chg_widths = [Inches(0.6), Inches(1.8), Inches(1.5), Inches(1.0), Inches(1.0), Inches(0.6)]
-    create_table_with_data(doc, chg_headers, chg_rows, col_widths=chg_widths, font_size=7.5)
+    chg_widths = [Inches(0.5), Inches(2.6), Inches(2.4), Inches(1.3)]
+    create_table_with_data(doc, chg_headers, chg_rows, col_widths=chg_widths, font_size=8.0)
 
 def build_section_ai_usage(doc):
-    add_heading_styled(doc, "9. AI Usage Log", level=1)
+    add_heading_styled(doc, "AI Usage Log", level=1)
     add_paragraph_styled(doc, (
         "In compliance with the Course Generative AI Policy, all four team members maintain a transparent, verifiable "
         "log of AI tool usage across the software design lifecycle. AI outputs were treated strictly as preliminary drafts "
         "and were systematically subjected to human verification, code-level testing, and architectural cross-review."
     ))
 
-    ai_headers = ["#", "Member", "Tool", "Task / Purpose", "Verification and Modification Method"]
+    ai_headers = ["#", "Member", "Tool", "Task / purpose", "How the output was verified and changed"]
     ai_rows = [
         [
             "1",
@@ -158,26 +150,7 @@ def build_section_ai_usage(doc):
             "Manually inspected rendered layouts at 1024px, 1440px, and 1920px in Chrome, Edge, and Firefox; executed Vitest client tests; verified WCAG contrast."
         ]
     ]
-    ai_widths = [Inches(0.4), Inches(1.3), Inches(1.1), Inches(1.8), Inches(1.9)]
-    create_table_with_data(doc, ai_headers, ai_rows, col_widths=ai_widths, font_size=7.5)
+    ai_widths = [Inches(0.4), Inches(1.4), Inches(1.1), Inches(1.9), Inches(2.0)]
+    create_table_with_data(doc, ai_headers, ai_rows, col_widths=ai_widths, font_size=8.0)
 
-def build_section_signoff(doc):
-    add_heading_styled(doc, "10. Sign-off and Delivery Acceptance", level=1)
-    add_paragraph_styled(doc, (
-        "We, the undersigned members of Team T05, hereby certify that we have reviewed, verified, and accepted the Software Design "
-        "Document (PA3) and the accompanying software demonstration baseline (Release Tag v0.3-pa3-demo). "
-        "We confirm that all 7 functional modules (F01–F07) comply with the frozen SRS PA2 baseline, all automated test suites pass, "
-        "and our individual contributions each represent exactly 25.0% of the total team effort."
-    ))
-
-    so_headers = ["Member Name", "Student ID", "Role in Project", "Contribution", "Sign-off Status", "Signature Confirmation"]
-    so_rows = [
-        ["Nguyễn Phan Thế Vinh", "23127520", "Team Lead / PM · Backend / Tester", "25.0%", "Approved & Signed", "Nguyễn Phan Thế Vinh (Signed 2026-11-27)"],
-        ["Trần Hà Anh Quân", "24127228", "Fullstack Developer / Tech Lead", "25.0%", "Approved & Signed", "Trần Hà Anh Quân (Signed 2026-11-27)"],
-        ["Nguyễn Thanh Thảo Nguyên", "24127469", "Business Analyst (BA)", "25.0%", "Approved & Signed", "Nguyễn Thanh Thảo Nguyên (Signed 2026-11-27)"],
-        ["Vũ Thị Ánh", "24127324", "UI/UX Designer / Frontend Architect", "25.0%", "Approved & Signed", "Vũ Thị Ánh (Signed 2026-11-27)"]
-    ]
-    so_widths = [Inches(1.2), Inches(0.8), Inches(1.5), Inches(0.7), Inches(1.0), Inches(1.3)]
-    create_table_with_data(doc, so_headers, so_rows, col_widths=so_widths, font_size=7.5)
-
-print("Part 5 definitions loaded.")
+print("build_pa3_part5 loaded successfully.")

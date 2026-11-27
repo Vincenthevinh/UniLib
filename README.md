@@ -32,8 +32,8 @@ UniLib là Hệ thống Quản lý Thư viện Đại học (University Library 
 
 Make sure the following are installed before getting started:
 
-- [Node.js 20+](https://nodejs.org) (Recommended: Node.js 22 LTS)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- [Node.js 20+](https://nodejs.org) (Khuyến nghị: Node.js 22 LTS)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) (để chạy PostgreSQL 16)
 - [Git](https://git-scm.com)
 - [npm](https://www.npmjs.com) (>= 10.x)
 
@@ -48,19 +48,22 @@ git clone https://github.com/Vincenthevinh/UniLib.git
 cd UniLib
 ```
 
-### 2. Start the database (and full API stack via Docker)
+### 2. Start the database
+
+Khởi động container PostgreSQL 16 trên cổng host `55432` (tránh xung đột cổng mặc định `5432` trên Windows):
 
 ```bash
-docker compose up -d
+docker compose up -d db
 ```
 
-Verify containers are running:
+Verify container database đang hoạt động:
 
 ```bash
 docker compose ps
-# unilib_db    running   0.0.0.0:55432->5432/tcp
-# unilib_api   running   0.0.0.0:18081->3001/tcp
+# unilib_db   running   127.0.0.1:55432->5432/tcp (healthy)
 ```
+
+*(Tùy chọn: Nếu muốn chạy cả Backend API trong Docker container mà không cần cài Node cục bộ, chạy `docker compose up -d` $\rightarrow$ API lắng nghe tại `http://localhost:18081`).*
 
 ### 3. Set up Backend
 
@@ -80,17 +83,21 @@ copy .env.example .env      # Windows
 npm ci
 ```
 
+*(Lưu ý: File `.env` của client mặc định cấu hình `VITE_USE_MOCK=false` và `VITE_API_BASE_URL=/api` để tự động kết nối qua proxy tới backend thật trên cổng 4000).*
+
 ### 5. Migrate database & Seed data
 
+Mở terminal tại thư mục `src/server`:
+
 ```bash
-cd ../server
+cd src/server
 npx prisma migrate deploy
-npm run db:seed
+npm run db:seed             # hoặc: npm run prisma:seed
 ```
 
-After seeding completes you should see:
+Sau khi seed dữ liệu hoàn tất, bạn sẽ thấy:
 
-```
+```text
 🎉 Seed completed! (9 users, 30 titles, 80 copies, 5 active loans, 2 pending holds)
   Admin:       admin       / UniLibDemo!2026
   Librarian:   librarian1  / UniLibDemo!2026
@@ -101,129 +108,136 @@ After seeding completes you should see:
 
 ### 6. Run the servers
 
-Open **2 separate terminals**:
+Mở **2 terminal riêng biệt**:
 
 ```bash
-# Terminal 1 — Backend API
+# Terminal 1 — Backend API (Node.js 22 + Express)
 cd src/server
 npm run dev
-# → http://localhost:3001 (or http://localhost:18081 if running in Docker)
+# → Server chạy tại: http://localhost:4000
 ```
 
 ```bash
-# Terminal 2 — Frontend Client
+# Terminal 2 — Frontend Client (React 18 + Vite)
 cd src/client
 npm run dev
-# → http://localhost:5173
+# → Client chạy tại: http://localhost:5173
 ```
+
+*(Hoặc từ thư mục gốc repository, bạn có thể chạy song song: `npm run dev:server` và `npm run dev:client`).*
 
 ### 7. Verify
 
 | URL | Expected result |
 |---|---|
-| http://localhost:3001/api/health | `{"status":"ok","database":"connected"}` |
-| http://localhost:5173 | UniLib React Client SPA is running (`SCR-01` Login) |
-| http://localhost:5555 | Prisma Studio (run `npx prisma studio` in `src/server`) |
+| http://localhost:4000/api/health | `{"status":"ok","database":"connected","timestamp":"..."}` |
+| http://localhost:5173 | Giao diện UniLib React SPA (`SCR-01` Login) |
+| http://localhost:5555 | Prisma Studio UI (chạy lệnh `npx prisma studio` tại `src/server`) |
 
 ## W1 Release Demo Features (F01–F07 Scope)
 
-- **F01 (Authentication & RBAC):** Credential sign-in, stateless JWT tokens, client logout, admin user management (`SCR-01`, `SCR-02`).
-- **F02 (Catalog Management):** 30 seeded titles, metadata creation/editing, real-time copy counters (`SCR-03`, `SCR-06`).
-- **F03 (Copy Inventory):** 80 physical copies, unique barcodes, shelf locations, condition inspection (`SCR-04`).
-- **F04 (Search & Browse):** Multi-attribute search (title, author, ISBN, category), category filter, available-only toggle, sorting, server-side pagination (10 items/page, `NFR-01`) (`SCR-05`).
-- **F05 (Circulation Desk):** 14-day checkout duration (`BR-02`), 3-loan limit (`BR-01`), overdue borrowing block (`BR-04`), return check-in with condition inspection and auto-hold trigger (`SCR-07`, `SCR-08`).
-- **F06 (Reservation & Holds):** Zero-available reservation placement (`BR-05`), FIFO queuing (`BR-07`), 72-hour hold shelf allocation (`BR-08`), patron cancellation (`SCR-09`, `SCR-10`).
-- **F07 (Dashboard & Overdue):** Reader personal dashboard (loans, renewal status `BR-03`, queue position) and Librarian overdue monitoring (`SCR-11`, `SCR-12`).
+- **F01 (Authentication & RBAC):** Đăng nhập xác thực tài khoản, cấp phát Bearer JWT, đăng xuất, quản lý người dùng bởi Quản trị viên (`SCR-01`, `SCR-02`).
+- **F02 (Catalog Management):** 30 đầu sách mẫu, tạo mới/chỉnh sửa thông tin sách, thống kê số lượng bản sao khả dụng thời gian thực (`SCR-03`, `SCR-06`).
+- **F03 (Copy Inventory):** 80 bản sao vật lý, quản lý mã vạch barcode, vị trí kệ sách, ghi nhận tình trạng sách (`SCR-04`).
+- **F04 (Search & Browse):** Tìm kiếm đa tiêu chí (tên sách, tác giả, ISBN, thể loại), lọc sách sẵn có, sắp xếp, phân trang phía máy chủ (10 bản ghi/trang, `NFR-01`) (`SCR-05`).
+- **F05 (Circulation Desk):** Mượn sách hạn 14 ngày (`BR-02`), tối đa 3 cuốn (`BR-01`), chặn mượn khi có sách quá hạn (`BR-04`); trả sách kiểm tra tình trạng vật lý và tự động gán giữ chỗ (`SCR-07`, `SCR-08`).
+- **F06 (Reservation & Holds):** Đặt trước khi sách hết bản sao sẵn có (`BR-05`), xếp hàng chờ FIFO (`BR-07`), tự động cấp chỗ 72 giờ khi sách được trả (`BR-08`), hủy đặt trước (`SCR-09`, `SCR-10`).
+- **F07 (Dashboard & Overdue):** Dashboard cá nhân bạn đọc (sách đang mượn, hạn trả, gia hạn `BR-03`, vị trí hàng chờ) và màn hình thủ thư giám sát sách quá hạn (`SCR-11`, `SCR-12`).
 
-### Reader 3-Minute Demo Walkthrough (`docs/pa3/demo-script.md`)
+### Kịch bản Trải nghiệm Demo 3 Phút Luồng Bạn Đọc (`docs/pa3/demo-script.md`)
 
-1. **0:00–0:30 · Sign In & Role Routing (`SCR-01`):** Show generic error on bad credentials (prevent enumeration, `AC-F01-02`); sign in as `reader1` and redirect to catalog.
-2. **0:30–1:15 · Search, Filter & Pagination (`SCR-05`):** Search by keyword, filter by category, toggle `Available now`, sort by title/year, paginate.
-3. **1:15–2:00 · Book Detail & Reserve Modal (`SCR-06` $\rightarrow$ `SCR-09`):** Select title with `Available = 0` (`BR-05`), review 72-hour hold rule (`BR-08`), submit reservation.
-4. **2:00–2:45 · Personal Dashboard (`SCR-11`):** Verify `Queue Position: 1` (`BR-07`), check loan due dates and renewal button disabled reasons (`BR-03`).
-5. **2:45–3:00 · Responsive Verification (`NFR-07`):** Verify clean layout across 1024px, 1440px, and 1920px viewports without console errors.
+1. **0:00–0:30 · Đăng nhập & Điều hướng Phân quyền (`SCR-01`):** Thử sai mật khẩu thấy thông báo chung an toàn (chống dò quét, `AC-F01-02`); đăng nhập bằng `reader1` và tự động vào trang tra cứu sách.
+2. **0:30–1:15 · Tra cứu, Lọc & Phân trang (`SCR-05`):** Tìm kiếm theo từ khóa, lọc theo thể loại, bật cờ `Available now`, đổi sắp xếp theo Tiêu đề / Năm và chuyển trang.
+3. **1:15–2:00 · Chi tiết Đầu sách & Modal Đặt trước (`SCR-06` $\rightarrow$ `SCR-09`):** Chọn đầu sách hết bản sao (`Available = 0`), xem quy tắc giữ chỗ 72 giờ (`BR-08`), bấm `Confirm Reservation`.
+4. **2:00–2:45 · Dashboard Cá nhân (`SCR-11`):** Kiểm tra yêu cầu đặt trước hiển thị đúng số thứ tự hàng chờ `Queue Position: 1` (`BR-07`), kiểm tra hạn trả sách và lý do nút gia hạn `Renew` bị khóa nếu không đủ điều kiện (`BR-03`).
+5. **2:45–3:00 · Kiểm chứng Đa Độ phân giải (`NFR-07`):** Kiểm tra giao diện đáp ứng mượt mà trên các độ phân giải `1024px`, `1440px`, `1920px` không lỗi console.
 
 ---
 
 ## Scripts
 
-### Root
+### Root (`/`)
 
 ```bash
-npm test              # Run full test suite across server and client
-npm run lint          # Run ESLint across server and client
+npm test              # Chạy full test suite (13 server suites, 237 tests + client vitest)
+npm run lint          # Chạy ESLint kiểm tra cú pháp trên cả server và client
+npm run dev:server    # Khởi chạy riêng Backend API dev server
+npm run dev:client    # Khởi chạy riêng Frontend Client Vite dev server
 ```
 
 ### Backend (`src/server`)
 
 ```bash
-npm run dev           # Run development API server with nodemon
-npm run start         # Run production API server
-npm run db:migrate    # Deploy Prisma migrations
-npm run db:seed       # Seed sample library dataset
-npm run db:reset      # Reset and re-seed database (destructive)
-npm run test          # Run Jest + Supertest suites (13 suites, 237 tests)
-npm run lint          # Run ESLint on backend code
+npm run dev           # Chạy API server chế độ dev với nodemon (cổng 4000)
+npm run start         # Chạy API server chế độ production (node server.js)
+npm run db:migrate    # Thực thi các file migration Prisma lên PostgreSQL
+npm run db:seed       # Nạp dữ liệu mẫu (9 users, 30 titles, 80 copies, 5 loans)
+npm run db:reset      # Reset toàn bộ CSDL và nạp lại seed sạch (Destructive)
+npm run test          # Chạy toàn bộ 13 test suites của Backend với Jest
+npm run test:db       # Chạy riêng integration test trên DB PostgreSQL (unilib_test)
+npm run smoke         # Chạy script kiểm thử smoke 15 kịch bản API trực tiếp
+npm run lint          # Kiểm tra chuẩn mã nguồn Backend qua ESLint
+npm run lint:fix      # Tự động sửa các lỗi ESLint có thể fix được
 ```
 
 ### Frontend (`src/client`)
 
 ```bash
-npm run dev           # Run Vite development server (localhost:5173)
-npm run build         # Build production bundle to dist/
-npm run test          # Run Vitest client tests
-npm run lint          # Run ESLint on frontend code
+npm run dev           # Chạy Vite development server (cổng 5173)
+npm run build         # Build mã nguồn production tối ưu vào thư mục dist/
+npm run preview       # Xem trước bản build production tại local
+npm run test          # Chạy kiểm thử tự động Frontend với Vitest
+npm run lint          # Kiểm tra chuẩn mã nguồn Frontend qua ESLint
 ```
 
 ## Test Accounts
 
-All accounts use the common demo password: **`UniLibDemo!2026`**
+Tất cả các tài khoản kiểm thử đều sử dụng mật khẩu chung: **`UniLibDemo!2026`**
 
-| Role | Username | Target Screen | Responsibility |
+| Vai trò | Tên đăng nhập | Màn hình khởi đầu | Trách nhiệm kiểm thử |
 |---|---|---|---|
-| Administrator | `admin` | `/admin/users` (`SCR-02`) | User account management, role assignment, account activation |
-| Librarian | `librarian1` | `/librarian/borrow` (`SCR-07, 08`) | Circulation desk checkout, return, condition inspection |
-| Librarian | `librarian2` | `/librarian/catalog` (`SCR-03, 04`) | Catalog title creation, copy inventory, overdue tracking |
-| Reader | `reader1` | `/reader/catalog` (`SCR-05, 06`) | Catalog browse, book reservation, personal dashboard |
-| Reader | `reader2` | `/reader/catalog` (`SCR-05, 11`) | FIFO queue progression testing (position 2) |
-| Reader | `reader3`..`6` | `/reader/catalog` (`SCR-05, 11`) | Multi-user hold contention and overdue suspension testing |
+| Quản trị viên | `admin` | `/admin/users` (`SCR-02`) | Quản lý người dùng, phân quyền, kích hoạt/vô hiệu hóa tài khoản |
+| Thủ thư | `librarian1` | `/librarian/borrow` (`SCR-07, 08`) | Thực hiện mượn/trả sách, kiểm tra tình trạng sách tại quầy |
+| Thủ thư | `librarian2` | `/librarian/catalog` (`SCR-03, 04`) | Biên mục đầu sách mới, quản lý bản sao vật lý, theo dõi quá hạn |
+| Bạn đọc | `reader1` | `/reader/catalog` (`SCR-05, 06`) | Tra cứu danh mục, đặt trước sách, xem Dashboard cá nhân |
+| Bạn đọc | `reader2` | `/reader/catalog` (`SCR-05, 11`) | Kiểm thử thứ tự hàng đợi FIFO (Vị trí số 2) |
+| Bạn đọc | `reader3`..`6` | `/reader/catalog` (`SCR-05, 11`) | Kiểm thử tranh chấp đặt trước nhiều người và chặn mượn do quá hạn |
 
 ---
 
 ## Git Workflow
 
 ```text
-main                        ← production-ready, protected baseline
-feature/V*-W1, Q*-W1        ← individual work packages
+main                        ← Nhánh chính sẵn sàng cho production, nhận merge từ PR
+feature/V*-W1, Q*-W1        ← Mỗi task/công việc phát triển trên 1 nhánh riêng biệt
 ```
 
-**Process:**
+**Quy trình chuẩn:**
 
-1. Pick an assigned task from the GitHub Project board ([UniLib Board](https://github.com/users/Vincenthevinh/projects/1)).
-2. Create a branch from `main`: `git checkout -b feature/V5-W1-gate-release`.
-3. Implement code/docs and commit using Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`).
-4. Push branch and open a Pull Request into `main`.
-5. PR triggers GitHub Actions CI (`repository-checks`: Jest test suites, Vitest, ESLint).
-6. Request at least one human peer review according to the Peer Review Matrix.
-7. Merge into `main` after all CI checks pass and reviewer approval is received.
+1. Nhận task được phân công trên bảng dự án ([UniLib Project Board](https://github.com/users/Vincenthevinh/projects/1)).
+2. Tạo nhánh tính năng từ `main`: `git checkout -b feature/V5-W1-gate-release`.
+3. Lập trình và commit thường xuyên theo chuẩn Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`).
+4. Đẩy nhánh lên remote và mở Pull Request (PR) vào `main`.
+5. PR tự động kích hoạt quy trình CI trên GitHub Actions (chạy kiểm thử Jest, Vitest và linter ESLint).
+6. Yêu cầu ít nhất một thành viên phản biện chéo (Peer Review) theo Ma trận Phản biện.
+7. Merge vào `main` sau khi tất cả các kiểm tra CI pass và nhận được phê duyệt từ reviewer.
 
 ---
 
 ## Troubleshooting
 
 **`P1001: Can't reach database server`**
-```bash
-docker compose up -d
-# Ensure container is healthy on port 55432
-```
+- Đảm bảo container PostgreSQL đang chạy bằng lệnh: `docker compose up -d db`.
+- Kiểm tra xem cổng host `55432` có bị chiếm dụng hay không. Kiểm tra chuỗi `DATABASE_URL` trong `src/server/.env` phải trỏ đúng tới `localhost:55432`.
 
-**`Port 5432 or 3001 already in use`**
-- UniLib maps PostgreSQL to host port `55432` and Express API to host port `18081` in `docker-compose.yml` to avoid host conflicts. Update `DATABASE_URL` or `PORT` in `.env` if custom binding is needed.
+**`Port 4000 already in use`**
+- Nếu cổng 4000 bị ứng dụng khác chiếm dụng, bạn có thể đổi `PORT=4001` trong `src/server/.env`, sau đó cập nhật target trong `src/client/vite.config.js` (`target: 'http://localhost:4001'`).
 
-**`VITE_USE_MOCK warning in Client`**
-- Ensure `src/client/.env` has `VITE_USE_MOCK=false` so the frontend interacts directly with the live Express backend.
+**`Lỗi CORS hoặc không gọi được API từ Frontend`**
+- Đảm bảo backend đang chạy tại `http://localhost:4000`.
+- Kiểm tra file `src/client/.env` có `VITE_USE_MOCK=false` và `VITE_API_BASE_URL=/api` để Vite dev server tự động chuyển tiếp request tới backend.
 
-**`Prisma schema out of sync`**
+**`Prisma schema out of sync hoặc thiếu Migration`**
 ```bash
 cd src/server
 npx prisma generate
