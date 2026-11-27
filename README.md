@@ -134,32 +134,6 @@ npm run dev
 | http://localhost:5173 | Giao diện UniLib React SPA (`SCR-01` Login) |
 | http://localhost:5555 | Prisma Studio UI (chạy lệnh `npx prisma studio` tại `src/server`) |
 
----
-
-## Environment Variables
-
-### `src/server/.env`
-
-```env
-PORT=4000
-NODE_ENV=development
-DATABASE_URL="postgresql://unilib:unilib_dev_only@localhost:55432/unilib?schema=public"
-JWT_SECRET=unilib_jwt_development_secret_key_change_in_production
-JWT_EXPIRES_IN=7d
-CORS_ORIGIN=http://localhost:5173
-CLIENT_ORIGIN=http://localhost:5173
-RESERVATION_SWEEP_MS=60000
-```
-
-### `src/client/.env`
-
-```env
-VITE_USE_MOCK=false
-VITE_API_BASE_URL=/api
-```
-
----
-
 ## W1 Release Demo Features (F01–F07 Scope)
 
 - **F01 (Authentication & RBAC):** Đăng nhập xác thực tài khoản, cấp phát Bearer JWT, đăng xuất, quản lý người dùng bởi Quản trị viên (`SCR-01`, `SCR-02`).
@@ -215,49 +189,6 @@ npm run preview       # Xem trước bản build production tại local
 npm run test          # Chạy kiểm thử tự động Frontend với Vitest
 npm run lint          # Kiểm tra chuẩn mã nguồn Frontend qua ESLint
 ```
-
----
-
-## Project Structure
-
-```text
-UniLib/
-├── .github/                  CI/CD workflows, issue templates, PR template
-├── docs/
-│   ├── design/               Tài liệu thiết kế, ADRs, C4, UML, ERD, screens
-│   │   ├── a11y/             Ảnh bằng chứng kiểm tra Lighthouse & Color Contrast (A4)
-│   │   ├── adr/              4 Quyết định kiến trúc (ADR-001 đến ADR-004)
-│   │   ├── c4/               Mô hình C4 Context (L1) và Container (L2)
-│   │   ├── screens/          Ảnh chụp các màn hình giao diện SCR-01 đến SCR-12 (A5)
-│   │   └── uml/              Domain model, Sequence diagrams, State machines
-│   ├── pa3/                  Các phân đoạn tài liệu thiết kế PA3 chi tiết
-│   └── management/           Biên bản họp và kế hoạch phân công công việc
-├── pa/
-│   ├── PA2/                  SRS Baseline v1.0.0 (T05-PA2.docx)
-│   └── PA3/                  Hồ sơ Thiết kế Phần mềm hoàn chỉnh:
-│                             ├── PA3-SoftwareDesign.docx
-│                             └── PA3-SoftwareDesign.pdf
-├── src/
-│   ├── client/               Frontend Single Page Application (React 18 + Vite)
-│   │   ├── src/
-│   │   │   ├── api/          API client, endpoints, business error mapper
-│   │   │   ├── components/   Shared UI components, Modal, AppHeader
-│   │   │   ├── context/      AuthContext (quản lý phiên JWT)
-│   │   │   ├── pages/        Giao diện theo vai trò (reader, librarian, admin)
-│   │   │   └── styles/       CSS layouts và responsive polish (NFR-07)
-│   ├── server/               Backend REST API (Node.js 22 LTS + Express.js)
-│   │   ├── config/           Cấu hình biến môi trường và db health check
-│   │   ├── prisma/           schema.prisma (5 models), migrations, seed.js
-│   │   ├── src/
-│   │   │   ├── middlewares/  authenticate, authorize, errorHandler, requestId
-│   │   │   └── modules/      auth, users, books, copies, loans, reservations, dashboard
-│   │   └── tests/            13 Jest test suites (237 tests)
-│   └── V5-W1.md              Báo cáo bàn giao kỹ thuật Gate W1 & Release v0.3
-├── docker-compose.yml        Docker orchestration cho PostgreSQL 16 + Express API
-└── README.md                 Tài liệu hướng dẫn tổng quan và hướng dẫn chạy demo
-```
-
----
 
 ## Test Accounts
 
