@@ -1,6 +1,6 @@
 """
-UniLib PA3 - Part 4: Data Design & UI/UX Design (Updated with A4 a11y & A5 screen captures)
-Team T05 (HCMUS FIT)
+UniLib PA3 - Section 6: Data Design & Section 7: User Interface and User Experience Design
+Strictly matching PA3-SoftwareDesign-template.docx format
 """
 
 from docx.shared import Inches, Pt, RGBColor
@@ -10,9 +10,9 @@ from scripts.build_pa3_full import (
 )
 
 def build_section_data_design(doc):
-    add_heading_styled(doc, "5. Data Design", level=1)
+    add_heading_styled(doc, "Data Design", level=1)
     
-    add_heading_styled(doc, "5.1 Data Diagram (Entity-Relationship Diagram)", level=2)
+    add_heading_styled(doc, "Data Diagram", level=2)
     add_paragraph_styled(doc, (
         "The relational database schema is normalized to Third Normal Form (3NF) and implemented on PostgreSQL 16 via Prisma ORM. "
         "The schema models 5 primary relational tables: users, book_titles, book_copies, loans, and reservations. "
@@ -26,10 +26,10 @@ def build_section_data_design(doc):
         "Figure 5.1: UniLib Relational Database ERD (PostgreSQL 16 / 3NF) — Source: docs/design/erd.dbml"
     )
 
-    add_heading_styled(doc, "5.2 Data Specification", level=2)
+    add_heading_styled(doc, "Data Specification", level=2)
     add_paragraph_styled(doc, "Detailed column specifications and constraint rules across all 5 database tables:")
     
-    ddl_headers = ["Table", "Column", "Data Type", "Constraints", "Description"]
+    ddl_headers = ["Table", "Column", "Data type", "Constraints (PK, FK, NOT NULL, UNIQUE, CHECK)", "Description"]
     ddl_rows = [
         # users
         ["users", "id", "UUID", "PRIMARY KEY, default uuid()", "Unique identifier for user account."],
@@ -76,47 +76,46 @@ def build_section_data_design(doc):
         ["reservations", "expires_at", "TIMESTAMPTZ(3)", "NULL", "Hold pickup deadline (readyAt + 72 hours under BR-08)."],
         ["reservations", "fulfilled_at", "TIMESTAMPTZ(3)", "NULL", "Timestamp when held copy was checked out."]
     ]
-    ddl_widths = [Inches(1.1), Inches(1.3), Inches(1.2), Inches(1.5), Inches(1.4)]
+    ddl_widths = [Inches(1.0), Inches(1.2), Inches(1.0), Inches(1.8), Inches(1.8)]
     create_table_with_data(doc, ddl_headers, ddl_rows, col_widths=ddl_widths, font_size=7.5)
 
-    add_heading_styled(doc, "5.3 Normalisation and Indexes", level=2)
+    add_heading_styled(doc, "Normalisation and Indexes", level=2)
     add_paragraph_styled(doc, (
         "Normalisation Proof to 3NF: The database schema achieves strict Third Normal Form (3NF):\n"
         "1. 1NF Compliance: Every attribute contains only atomic scalar values. No composite or repeating groups exist.\n"
         "2. 2NF Compliance: All tables use single-attribute surrogate primary keys (UUID). Every non-key attribute is fully functionally dependent on the entire primary key.\n"
-        "3. 3NF Compliance: No transitive dependencies exist among non-key attributes. For example, BookTitle metadata (author, category, publicationYear) depends strictly on title_id and is not redundantly duplicated across physical BookCopy records. Similarly, calculated values such as overdue flags or available copy counts are derived dynamically at query time rather than redundantly stored."
+        "3. 3NF Compliance: No transitive dependencies exist among non-key attributes. Bibliographic metadata depends strictly on title_id and is not duplicated across physical copy records. Dynamic properties (overdue flags, available copy counts) are derived via queries rather than stored redundantly."
     ))
-
-    add_heading_styled(doc, "Relational Index Inventory (NFR-01 Performance)", level=3)
-    idx_headers = ["Index Name", "Target Table", "Columns", "Type / Predicate", "Performance Justification (NFR-01 / Workload)"]
-    idx_rows = [
-        ["users_username_key", "users", "username", "UNIQUE B-tree", "O(1) authentication lookup during login (SCR-01)."],
-        ["users_email_key", "users", "email", "UNIQUE B-tree", "O(1) email deduplication and login by email."],
-        ["book_titles_isbn_key", "book_titles", "isbn", "UNIQUE B-tree", "Instant ISBN lookup during cataloging and checkout."],
-        ["book_copies_barcode_key", "book_copies", "barcode", "UNIQUE B-tree", "Instant barcode resolution at circulation desk (SCR-07, 08)."],
-        ["idx_copies_title_status", "book_copies", "(title_id, status)", "Composite B-tree", "Real-time copy availability counts and zero-available hold checks (BR-05)."],
-        ["idx_loans_reader_active", "loans", "(reader_id, returned_at)", "Composite B-tree", "Evaluates active loan limits (BR-01) and patron dashboard queries (SCR-11)."],
-        ["idx_loans_copy_active", "loans", "(copy_id)", "Partial UNIQUE (returned_at IS NULL)", "Enforces physical invariant: at most one active loan per physical copy."],
-        ["idx_loans_due_active", "loans", "(due_at, returned_at)", "Composite B-tree", "High-speed overdue queries for librarian dashboard (SCR-12 / F07)."],
-        ["idx_res_title_created", "reservations", "(title_id, created_at)", "Composite B-tree", "Strict FIFO queue resolution (BR-07) and queue position calculation."],
-        ["idx_res_ready_copy", "reservations", "(held_copy_id)", "Partial UNIQUE (status = 'Ready')", "Enforces physical invariant: at most one active hold per physical copy."],
-        ["idx_res_reader_active", "reservations", "(reader_id, status)", "Composite B-tree", "Evaluates patron reservation limit (BR-06 <= 2)."],
-        ["idx_res_status_expires", "reservations", "(status, expires_at)", "Composite B-tree", "High-frequency background sweep of expired 72-hour holds (BR-08)."]
-    ]
-    idx_widths = [Inches(1.4), Inches(0.9), Inches(1.3), Inches(1.2), Inches(1.7)]
-    create_table_with_data(doc, idx_headers, idx_rows, col_widths=idx_widths, font_size=7.5)
 
     add_paragraph_styled(doc, (
-        "Concurrency & Row Locking (NFR-05): To satisfy NFR-05, all circulation state transitions (checkout, return, hold fulfillment) "
-        "execute inside PostgreSQL interactive transactions using SELECT FOR UPDATE on target book_copies and reservations rows. "
-        "This guarantees that concurrent checkout attempts on the same physical copy will result in exactly one successful checkout "
-        "(HTTP 201) and one conflict rejection (HTTP 409 CONCURRENT_MODIFICATION), completely eliminating race conditions."
+        "Pessimistic Concurrency Control: High-contention circulation workflows (borrowing and check-in auto-hold) execute inside "
+        "SERIALIZABLE or READ COMMITTED transactions combined with explicit row locks (SELECT FOR UPDATE on book_copies and book_titles rows). "
+        "This guarantees that two librarians cannot check out the same physical copy simultaneously, fulfilling NFR-05."
     ))
 
+    add_paragraph_styled(doc, "Relational Index Inventory (NFR-01 Performance):")
+    idx_headers = ["Index Name", "Target Table", "Columns", "Type / Predicate", "Performance Justification (NFR-01)"]
+    idx_rows = [
+        ["idx_users_username", "users", "username", "B-tree (UNIQUE)", "O(log N) lookup during authentication (UC-01)."],
+        ["idx_users_email", "users", "email", "B-tree (UNIQUE)", "O(log N) lookup during login / registration."],
+        ["idx_titles_isbn", "book_titles", "isbn", "B-tree (UNIQUE)", "Instant O(log N) barcode/ISBN catalog search."],
+        ["idx_titles_cat_year", "book_titles", "category, publication_year DESC", "Composite B-tree", "Accelerates catalog category filtering and year sorting."],
+        ["idx_titles_trgm", "book_titles", "title gin_trgm_ops, author gin_trgm_ops", "GIN (pg_trgm)", "Sub-second fuzzy keyword search on title/author <= 1.0s (NFR-01)."],
+        ["idx_copies_barcode", "book_copies", "barcode", "B-tree (UNIQUE)", "Instant physical barcode scanning at circulation desk (UC-07/08)."],
+        ["idx_copies_title_status", "book_copies", "title_id, status", "Composite B-tree", "Rapid calculation of availableCopyCount for catalog browse and BR-05."],
+        ["idx_loans_reader_active", "loans", "reader_id", "Partial B-tree (WHERE returned_at IS NULL)", "Instant validation of BR-01 (< 3 active loans) and BR-04."],
+        ["idx_loans_copy_active", "loans", "copy_id", "Partial B-tree (WHERE returned_at IS NULL)", "Enforces single-active-loan constraint per physical copy."],
+        ["idx_loans_due_active", "loans", "due_at", "Partial B-tree (WHERE returned_at IS NULL)", "High-performance scan for librarian overdue monitoring (SCR-12)."],
+        ["idx_res_title_status_created", "reservations", "title_id, status, created_at ASC", "Composite B-tree", "Instant FIFO queue placement and next-patron hold allocation (BR-07)."],
+        ["idx_res_reader_active", "reservations", "reader_id", "Partial B-tree (WHERE status IN ('Pending', 'Ready'))", "Enforces BR-06 (max 2 active holds per reader)."]
+    ]
+    idx_widths = [Inches(1.4), Inches(1.0), Inches(1.3), Inches(1.3), Inches(1.8)]
+    create_table_with_data(doc, idx_headers, idx_rows, col_widths=idx_widths, font_size=7.5)
+
 def build_section_ui_design(doc):
-    add_heading_styled(doc, "6. User Interface and User Experience Design", level=1)
+    add_heading_styled(doc, "User Interface and User Experience Design", level=1)
     
-    add_heading_styled(doc, "6.1 Screen List and Screen Flow Diagram", level=2)
+    add_heading_styled(doc, "Screen List and Screen Flow", level=2)
     add_paragraph_styled(doc, (
         "The Screen Navigation Flow maps all user journeys across the 12 system screens (SCR-01 to SCR-12), partitioned into three role shells: "
         "Reader Shell (/reader/*), Librarian Shell (/librarian/*), and Administrator Shell (/admin/*). All authenticated paths are gated by SCR-01."
@@ -127,113 +126,106 @@ def build_section_ui_design(doc):
         "Figure 6.1: UniLib Screen Navigation Flow Diagram (SCR-01 to SCR-12) — Source: docs/design/screen-flow.png"
     )
 
-    scr_headers = ["Screen ID", "Screen Name & Route", "Primary Role", "Related Use Case", "Workflow Summary"]
+    scr_headers = ["#", "Screen", "Description", "Related use case"]
     scr_rows = [
-        ["SCR-01", "Authentication & Login (/login)", "All Roles", "UC-01", "Credential authentication, password visibility toggle, role-based redirect."],
-        ["SCR-02", "Admin User Management (/admin/users)", "Administrator", "UC-02", "Create accounts, assign roles, activate/deactivate patron and staff accounts."],
-        ["SCR-03", "Book Catalog Management (/librarian/catalog)", "Librarian", "UC-03", "Librarian creation and editing of title metadata; active copy checks (BR-09)."],
-        ["SCR-04", "Book Copy Inventory (/librarian/copies)", "Librarian", "UC-04", "Physical copy registration, barcode generation, shelf location, condition updates."],
-        ["SCR-05", "Catalog Search & Browse (/reader/catalog)", "Reader", "UC-05", "Search by keyword, category filter, availability toggle, sort, server-side pagination."],
-        ["SCR-06", "Book Title Detail (/reader/books/:id)", "Reader", "UC-06, 10", "Aggregated copy counters, shelf locations, conditional Reserve Book trigger (BR-05)."],
-        ["SCR-07", "Circulation Desk — Borrow (/librarian/borrow)", "Librarian", "UC-07", "Scan patron ID and copy barcode; validate BR-01/02/04; execute checkout."],
-        ["SCR-08", "Circulation Desk — Return (/librarian/return)", "Librarian", "UC-08", "Scan barcode; inspect physical condition; auto-trigger next FIFO hold (BR-08)."],
-        ["SCR-09", "Book Reservation Modal (/reader/reservations)", "Reader", "UC-10", "Review 72h hold terms; confirm title reservation; receive queue position."],
-        ["SCR-10", "Hold Shelf Management (/librarian/holds)", "Librarian", "UC-11", "View Ready holds on shelf, track 72h expiry deadlines, view FIFO queue."],
-        ["SCR-11", "Reader Personal Dashboard (/reader/dashboard)", "Reader", "UC-09, 11, 12", "Track active loans, due dates, renewal eligibility (BR-03), cancel holds."],
-        ["SCR-12", "Overdue Circulation Monitoring (/librarian/overdue)", "Librarian", "UC-12", "Monitor overdue loans, calculate late days, view reader contact for recovery."]
+        ["1", "SCR-01: Authentication & Login (/login)", "Credential authentication, password visibility toggle, role-based redirect (All Roles).", "UC-01"],
+        ["2", "SCR-02: Admin User Management (/admin/users)", "Create accounts, assign roles, activate/deactivate patron and staff accounts (Administrator).", "UC-02"],
+        ["3", "SCR-03: Book Catalog Management (/librarian/catalog)", "Librarian creation and editing of title metadata; active copy deletion checks under BR-09.", "UC-03"],
+        ["4", "SCR-04: Book Copy Inventory (/librarian/copies)", "Physical copy registration, barcode generation, shelf location, condition updates (Librarian).", "UC-04"],
+        ["5", "SCR-05: Catalog Search & Browse (/reader/catalog)", "Search by keyword, category filter, availability toggle, sort, server-side pagination (Reader).", "UC-05"],
+        ["6", "SCR-06: Book Title Detail (/reader/books/:id)", "Aggregated copy counters, shelf locations, conditional Reserve Book trigger under BR-05 (Reader).", "UC-06, 10"],
+        ["7", "SCR-07: Circulation Desk — Borrow (/librarian/borrow)", "Scan patron ID and copy barcode; validate BR-01/02/04; execute checkout transaction (Librarian).", "UC-07"],
+        ["8", "SCR-08: Circulation Desk — Return (/librarian/return)", "Scan barcode; inspect condition; auto-trigger next FIFO hold under BR-08 (Librarian).", "UC-08"],
+        ["9", "SCR-09: Book Reservation Modal (/reader/reservations)", "Review 72h hold terms; confirm title reservation; receive queue position under BR-07 (Reader).", "UC-10"],
+        ["10", "SCR-10: Hold Shelf Management (/librarian/holds)", "View Ready holds on shelf, track 72h expiry deadlines, view FIFO queue (Librarian).", "UC-11"],
+        ["11", "SCR-11: Reader Personal Dashboard (/reader/dashboard)", "Track active loans, due dates, renewal eligibility (BR-03), cancel holds (Reader).", "UC-09, 11, 12"],
+        ["12", "SCR-12: Overdue Circulation Monitoring (/librarian/overdue)", "Monitor overdue loans, calculate late days, view reader contact for recovery (Librarian).", "UC-12"]
     ]
-    scr_widths = [Inches(0.8), Inches(1.6), Inches(1.0), Inches(0.9), Inches(2.2)]
-    create_table_with_data(doc, scr_headers, scr_rows, col_widths=scr_widths, font_size=7.5)
+    scr_widths = [Inches(0.4), Inches(2.2), Inches(3.4), Inches(0.8)]
+    create_table_with_data(doc, scr_headers, scr_rows, col_widths=scr_widths, font_size=8.0)
 
-    add_heading_styled(doc, "6.2 Detailed Screen Specifications", level=2)
+    add_heading_styled(doc, "Screen Specifications", level=2)
     add_paragraph_styled(doc, "Detailed specifications, controls, validations, and event handlers for core screens based on the live app captures:")
 
     # SCR-01
-    add_heading_styled(doc, "SCR-01: Authentication & Login (/login)", level=3)
+    add_heading_styled(doc, "Screen SCR-01: Authentication & Login (/login)", level=3)
     add_figure_image(doc, "docs/design/screens/scr-01-login.png", "Figure 6.2: Screen Specification SCR-01 (Authentication & Login) — Source: docs/design/screens/scr-01-login.png", width_inches=5.0)
-    s1_headers = ["Control", "Type", "Validation", "Event Handling"]
+    s1_headers = ["#", "Control", "Type", "Description / validation", "Event handling"]
     s1_rows = [
-        ["Username / Email Input", "Text Input", "Required, non-empty", "onChange updates credentials state; clears error banners."],
-        ["Password Input", "Password Input", "Required, non-empty", "onChange updates state; obscured text by default."],
-        ["Show / Hide Toggle", "Icon Button", "N/A", "onClick toggles input type between password and text."],
-        ["Sign In Button", "Submit Button", "Disabled while submitting", "onSubmit calls api.auth.login; handles generic 401 message; redirects by role."]
+        ["1", "Username / Email Input", "Text Input", "Required, non-empty university handle", "onChange updates credentials state; clears error banners."],
+        ["2", "Password Input", "Password Input", "Required, non-empty password string", "onChange updates state; obscured text by default."],
+        ["3", "Show / Hide Toggle", "Icon Button", "Accessible icon toggle button", "onClick toggles input type between password and text."],
+        ["4", "Sign In Button", "Submit Button", "Disabled while submitting request", "onSubmit calls api.auth.login; handles generic 401 message; redirects by role."]
     ]
-    create_table_with_data(doc, s1_headers, s1_rows, col_widths=[Inches(1.5), Inches(1.1), Inches(1.4), Inches(2.5)], font_size=8.0)
+    create_table_with_data(doc, s1_headers, s1_rows, col_widths=[Inches(0.4), Inches(1.5), Inches(1.1), Inches(1.5), Inches(2.3)], font_size=8.0)
 
     # SCR-05
-    add_heading_styled(doc, "SCR-05: Catalog Search & Browse (/reader/catalog)", level=3)
+    add_heading_styled(doc, "Screen SCR-05: Catalog Search & Browse (/reader/catalog)", level=3)
     add_figure_image(doc, "docs/design/screens/scr-05-catalog.png", "Figure 6.3: Screen Specification SCR-05 (Catalog Search & Filter) — Source: docs/design/screens/scr-05-catalog.png", width_inches=5.0)
-    s5_headers = ["Control", "Type", "Validation", "Event Handling"]
+    s5_headers = ["#", "Control", "Type", "Description / validation", "Event handling"]
     s5_rows = [
-        ["Keyword Search Input", "Search Input", "Free text query", "onChange updates search filter and resets pagination to page 1."],
-        ["Category Selector", "Dropdown Select", "Valid category options", "onChange filters titles by category and resets to page 1."],
-        ["Available Now Toggle", "Checkbox", "Boolean true/false", "onChange filters titles with availableCopyCount > 0."],
-        ["Sort Selector", "Dropdown Select", "title:asc, year:desc, etc.", "onChange sorts catalog results and resets to page 1."],
-        ["Pagination Controls", "Button Group", "Page index >= 1", "onClick fetches target page (default 10 items/page under NFR-01)."]
+        ["1", "Keyword Search Input", "Search Input", "Free text query across title/author/ISBN", "onChange updates search filter and resets pagination to page 1."],
+        ["2", "Category Selector", "Dropdown Select", "Valid library category options", "onChange filters titles by category and resets to page 1."],
+        ["3", "Available Now Toggle", "Checkbox", "Boolean true/false filter", "onChange filters titles with availableCopyCount > 0."],
+        ["4", "Sort Selector", "Dropdown Select", "title:asc, year:desc options", "onChange sorts catalog results and resets to page 1."],
+        ["5", "Pagination Controls", "Button Group", "Page index >= 1", "onClick fetches target page (default 10 items/page under NFR-01)."]
     ]
-    create_table_with_data(doc, s5_headers, s5_rows, col_widths=[Inches(1.5), Inches(1.1), Inches(1.4), Inches(2.5)], font_size=8.0)
+    create_table_with_data(doc, s5_headers, s5_rows, col_widths=[Inches(0.4), Inches(1.5), Inches(1.1), Inches(1.5), Inches(2.3)], font_size=8.0)
 
     # SCR-06 & SCR-09
-    add_heading_styled(doc, "SCR-06 & SCR-09: Book Detail & Reservation Modal", level=3)
+    add_heading_styled(doc, "Screen SCR-06 & SCR-09: Book Detail & Reservation Modal", level=3)
     add_figure_image(doc, "docs/design/screens/scr-06-book-detail.png", "Figure 6.4: Screen Specification SCR-06 (Book Title Detail) — Source: docs/design/screens/scr-06-book-detail.png", width_inches=5.0)
     add_figure_image(doc, "docs/design/screens/scr-09-reserve-modal.png", "Figure 6.5: Screen Specification SCR-09 (Book Reservation Modal) — Source: docs/design/screens/scr-09-reserve-modal.png", width_inches=5.0)
-    s6_headers = ["Control", "Type", "Validation", "Event Handling"]
+    s6_headers = ["#", "Control", "Type", "Description / validation", "Event handling"]
     s6_rows = [
-        ["Availability Badges", "Badge Summary", "Read-only counts", "Dynamically displays Total, Available, Borrowed, Reserved counts."],
-        ["Reserve Book Button", "Action Button", "Enabled only if Available === 0 (BR-05)", "onClick opens SCR-09 Reservation Modal; blocked if patron has overdue (BR-04)."],
-        ["Confirm Hold Button", "Modal Action", "Disabled while submitting", "onClick posts to /api/reservations; returns FIFO queuePosition; updates UI."],
-        ["Cancel Modal Button", "Modal Action", "Enabled", "onClick dismisses modal without creating reservation."]
+        ["1", "Reserve Book Button", "Action Button", "Enabled only if availableCopyCount === 0", "onClick opens SCR-09 modal; checks active holds limit under BR-06."],
+        ["2", "Copy Inventory Table", "Data Table", "Displays Barcode, Shelf, Status", "Renders physical copy status badges with accessible color contrast."],
+        ["3", "Hold Confirmation CTA", "Modal Button", "Prompts patron to acknowledge 72h rule", "onClick calls /api/reservations; displays assigned FIFO position."],
+        ["4", "Modal Close Button", "Icon Button", "Closes modal dialog without side-effects", "onClick hides modal and returns focus to book detail view."]
     ]
-    create_table_with_data(doc, s6_headers, s6_rows, col_widths=[Inches(1.5), Inches(1.1), Inches(1.4), Inches(2.5)], font_size=8.0)
+    create_table_with_data(doc, s6_headers, s6_rows, col_widths=[Inches(0.4), Inches(1.5), Inches(1.1), Inches(1.5), Inches(2.3)], font_size=8.0)
 
     # SCR-07 & SCR-08
-    add_heading_styled(doc, "SCR-07 & SCR-08: Circulation Desk (Borrow & Return)", level=3)
+    add_heading_styled(doc, "Screen SCR-07 & SCR-08: Circulation Desk (Borrow & Return)", level=3)
     add_figure_image(doc, "docs/design/screens/SCR-07.png", "Figure 6.6: Screen Specification SCR-07 (Circulation Desk — Borrow) — Source: docs/design/screens/SCR-07.png", width_inches=5.0)
     add_figure_image(doc, "docs/design/screens/SCR-08.png", "Figure 6.7: Screen Specification SCR-08 (Circulation Desk — Return) — Source: docs/design/screens/SCR-08.png", width_inches=5.0)
-    s7_headers = ["Control", "Type", "Validation", "Event Handling"]
+    s7_headers = ["#", "Control", "Type", "Description / validation", "Event handling"]
     s7_rows = [
-        ["Reader Barcode Input", "Text Input", "Valid user handle/UUID", "Resolves reader; checks BR-01 (loans < 3) and BR-04 (no overdue)."],
-        ["Copy Barcode Input", "Text Input", "Valid physical barcode", "Resolves copy; verifies copy is Available or Reserved for this reader."],
-        ["Condition Selector", "Dropdown Select", "Good, Fair, Damaged, Lost", "Librarian records return condition; Damaged updates copy status."],
-        ["Checkout / Return Action", "Action Button", "Disabled while submitting", "Executes atomic transaction; updates due date (14d) or triggers next hold."]
+        ["1", "Patron ID Input", "Search Input", "Valid 8-digit student/patron identifier", "onBlur fetches patron active loans count and overdue suspension status."],
+        ["2", "Barcode Scanner Input", "Barcode Input", "Valid registered physical copy barcode", "onKeyDown(Enter) validates copy status; executes checkout under BR-01."],
+        ["3", "Condition Selector", "Radio / Select", "Good, Fair, Poor, Damaged options", "onChange updates return condition inspection notes."],
+        ["4", "Return Book CTA", "Action Button", "Valid checked-out copy barcode", "onClick executes check-in transaction; auto-triggers next FIFO hold (BR-08)."]
     ]
-    create_table_with_data(doc, s7_headers, s7_rows, col_widths=[Inches(1.5), Inches(1.1), Inches(1.4), Inches(2.5)], font_size=8.0)
+    create_table_with_data(doc, s7_headers, s7_rows, col_widths=[Inches(0.4), Inches(1.5), Inches(1.1), Inches(1.5), Inches(2.3)], font_size=8.0)
 
     # SCR-11 & SCR-12
-    add_heading_styled(doc, "SCR-11 & SCR-12: Dashboards & Overdue Monitoring", level=3)
+    add_heading_styled(doc, "Screen SCR-11 & SCR-12: Dashboards & Overdue Monitoring", level=3)
     add_figure_image(doc, "docs/design/screens/scr-11-dashboard.png", "Figure 6.8: Screen Specification SCR-11 (Reader Personal Dashboard) — Source: docs/design/screens/scr-11-dashboard.png", width_inches=5.0)
     add_figure_image(doc, "docs/design/screens/SCR-12.png", "Figure 6.9: Screen Specification SCR-12 (Overdue Circulation Monitoring) — Source: docs/design/screens/SCR-12.png", width_inches=5.0)
-    s11_headers = ["Control", "Type", "Validation", "Event Handling"]
+    s11_headers = ["#", "Control", "Type", "Description / validation", "Event handling"]
     s11_rows = [
-        ["Overdue Warning Banner", "Alert Box", "Shown if hasOverdue === true", "Displays prominent warning indicating borrowing is suspended under BR-04."],
-        ["Renew Loan Button", "Table Action", "Disabled if overdue/renewed/queued", "Calls /api/loans/:id/renew; extends dueAt by 14 days under BR-03."],
-        ["Cancel Hold Button", "Table Action", "Active holds only", "Calls DELETE /api/reservations/:id; releases position or reallocates copy."],
-        ["Overdue List View", "Table (SCR-12)", "Librarian role only", "Lists late loans sorted by lateDays desc; displays patron contact info."]
+        ["1", "Overdue Warning Banner", "Alert Box", "Shown if patron has overdue loans", "Displays prominent warning indicating borrowing is suspended under BR-04."],
+        ["2", "Renew Loan Button", "Table Action", "Disabled if overdue/renewed/queued", "Calls /api/loans/:id/renew; extends dueAt by 14 days under BR-03."],
+        ["3", "Cancel Hold Button", "Table Action", "Active pending/ready holds only", "Calls DELETE /api/reservations/:id; releases position or reallocates copy."],
+        ["4", "Overdue List View", "Table (SCR-12)", "Librarian role only", "Lists late loans sorted by lateDays desc; displays patron contact info."]
     ]
-    create_table_with_data(doc, s11_headers, s11_rows, col_widths=[Inches(1.5), Inches(1.1), Inches(1.4), Inches(2.5)], font_size=8.0)
+    create_table_with_data(doc, s11_headers, s11_rows, col_widths=[Inches(0.4), Inches(1.5), Inches(1.1), Inches(1.5), Inches(2.3)], font_size=8.0)
 
-    add_heading_styled(doc, "6.3 Accessibility Checklist (NFR-06 & NFR-07)", level=2)
+    add_heading_styled(doc, "Accessibility Checklist", level=2)
     add_paragraph_styled(doc, (
         "In strict compliance with NFR-06, Team T05 conducted automated Google Lighthouse Accessibility audits and color contrast inspections "
-        "across core system views. The system consistently achieves Accessibility scores >= 96 (surpassing the >= 85 target) and maintains "
-        "contrast ratios >= 4.5:1 for all textual and interactive elements."
+        "across core system views. The design adheres strictly to the accessibility criteria:"
     ))
+    add_bullet_point(doc, "Text contrast >= 4.5:1; colour is not the only way to convey information: Deep navy primary palette (#1F497D) against white (#FFFFFF) achieves an 11.4:1 contrast ratio, surpassing WCAG AAA (7.0:1). All status badges pair color indicators with explicit textual labels.")
+    add_bullet_point(doc, "All functions usable with the keyboard; visible focus: Logical tab order implemented across all interactive controls. High-contrast visible focus rings (:focus-visible) ensure full keyboard navigation without mouse.")
+    add_bullet_point(doc, "Form fields have labels; error messages explain how to fix the problem: Every input element is explicitly linked to <label> via htmlFor. Structured validation error envelopes display clear, actionable guidance.")
+    add_bullet_point(doc, "Layout works on mobile and desktop (responsive): Fluid CSS Grid and Flexbox layouts maintain full functionality across 1024px, 1440px, and 1920px viewports with zero horizontal scrolling.")
 
-    # Add Lighthouse figures for A4
+    # Lighthouse figures
     add_figure_image(doc, "docs/design/a11y/lighthouse-scr-01.png", "Figure 6.10: Lighthouse Accessibility Audit SCR-01 (Score: 100) — Source: docs/design/a11y/lighthouse-scr-01.png", width_inches=5.0)
     add_figure_image(doc, "docs/design/a11y/lighthouse-scr-05.png", "Figure 6.11: Lighthouse Accessibility Audit SCR-05 (Score: 96) — Source: docs/design/a11y/lighthouse-scr-05.png", width_inches=5.0)
     add_figure_image(doc, "docs/design/a11y/lighthouse-scr-06.png", "Figure 6.12: Lighthouse Accessibility Audit SCR-06 (Score: 98) — Source: docs/design/a11y/lighthouse-scr-06.png", width_inches=5.0)
     add_figure_image(doc, "docs/design/a11y/lighthouse-scr-11.png", "Figure 6.13: Lighthouse Accessibility Audit SCR-11 (Score: 100) — Source: docs/design/a11y/lighthouse-scr-11.png", width_inches=5.0)
     add_figure_image(doc, "docs/design/a11y/contrast.png", "Figure 6.14: Color Contrast Inspection & Palette Validation (11.4:1) — Source: docs/design/a11y/contrast.png", width_inches=5.0)
 
-    acc_headers = ["Accessibility Standard", "Implementation Realization", "Verification Evidence"]
-    acc_rows = [
-        ["Color Contrast >= 4.5:1", "Deep navy primary palette (#1F497D) against white (#FFFFFF); status badges pair color with explicit text labels.", "Measured contrast 11.4:1 (exceeds AAA 7.0:1). Lighthouse Accessibility score >= 96. (Figure 6.14)"],
-        ["Full Keyboard Operability", "Logical tab order across all interactive controls; visible high-contrast focus rings (:focus-visible).", "Full workflow traversal tested using Tab, Shift+Tab, Enter, and Esc without mouse."],
-        ["Form Labels & Error Hints", "Every input element explicitly linked to <label> via htmlFor; inline aria-describedby for errors.", "Screen reader audit verifies field labels and actionable validation messages."],
-        ["Responsive Layout Integrity", "Fluid CSS Grid/Flexbox layouts with zero horizontal scroll across 1024px, 1440px, and 1920px viewports.", "Browser emulation testing in Chrome, Firefox, and Edge confirms layout integrity (NFR-07)."]
-    ]
-    acc_widths = [Inches(1.6), Inches(2.8), Inches(2.1)]
-    create_table_with_data(doc, acc_headers, acc_rows, col_widths=acc_widths, font_size=8.0)
-
-print("Part 4 updated successfully.")
+print("build_pa3_part4 loaded successfully.")
